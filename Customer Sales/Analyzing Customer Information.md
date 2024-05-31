@@ -6,12 +6,32 @@ specializing in cleaning chemicals for the purpose of machine preservation and m
 
 A CSV file full of consumer information and transaction data was brought to me to be organized, manipulated,
 and analyzed for further EDA down the road.
-The CSV dataset that will be used contains customer information (ID, purchase date, and quantity)
+
+Our stakeholders are requesting a visualization of company-profit and sale numbers
+to possibly theorize a plan to boost sales numbers, increase income, and expand the product line.
+
+The CSV dataset that will be used in this notebook contains customer information (ID, purchase date, and quantity)
 as well as product information (ID, quantity of sale, and price per gallon).
 
 Below, we will answer several questions and highlight important milestones for our data manipulation using SQL:
 
-### Cleaning and Preprocessing
+### [Cleaning and Preprocessing](#Cleaning-and-Preprocessing)
+* [Excel Functions](#Excel-Functions)
+* [SQL Manipulation](#SQL-Manipulation)
+### [Customer Analysis]()
+* [Which of our customers are the top buyers?]()
+* [Which of our customers are the bottom buyers?]()
+* [What is the average purchase value per customer?]()
+### [Product Analysis]()
+* [What are the most purchased products?]()
+* [What are the least purchased products?]()
+* [Which products generate the highest revenue?]()
+* [Which products generate the least revenue?]()
+
+
+## Cleaning and Preprocessing
+
+### Excel Functions
 
 Prior to any SQL usage, we can look over our data in ```Excel``` and check over any problems that may arise.
 It seems that there are several NULL values that exist within the ```Supplier_ID``` column!
@@ -25,7 +45,16 @@ to fill in any null values that correlate with product type.
 
 [Out]
 
-All product types will have the correct ID associated with their type. 
+**All product types will have the correct ID associated with their type.** 
+
+Additionally, it seems that the column organizing our data by date,
+```Purchase Date``` is unorganized and lacking an order.
+To fix this we can simply click the column, ```Purchase Date```,
+right click the selected column and sort by either ```largest -> smallest``` or ```smallest -> largest```.
+In our case this data will be ascending, so the ```smallest -> largest``` will be picked.
+Now our data is ready for SQL import.  
+
+## SQL Manipulation
 
 SQL will be used to import the ```chemical_transactions.csv``` file into our SQL Database.
 For the sake of clarity,
@@ -40,22 +69,48 @@ LIMIT 5
 ```
 [Out]
 
-| Customer ID | Product Information | Product ID | Purchase Date | Quantity | Price Per Gallon | Transactions | Column8 |
-|:-----------:|:-------------------:|:----------:|:-------------:|:--------:|:----------------:|:------------:|:-------:|
-|   C-685696  |    Glycol Ethers    |   P-16484  |    4/8/2022   |  25994   |      $89.46      |    25994     |#$%^%^25994######89.46&^vv^%^|
-|   C-685170  |   Sodium Hydroxide  |   P-12810  |    4/2/2022   |   4604   |      $76.86      |     4604     |#$%^%^4604######76.86&^vv^%^|
-|   C-685784  | Sodium Hypochlorite |   P-14445  |   12/8/2022   |  65256   |      $45.00      |    65256     |#$%^%^65256######45&^vv^%^|
-|   C-685208  | Sodium Hypochlorite |   P-14445  |   3/31/2023   |   8320   |      $45.00      |     8320     |#$%^%^8320######45&^vv^%^|
-|   C-685249  |   Hydrochloric Acid  |   P-13770  |   7/30/2022   |  43555   |     $165.00      |    43555     |#$%^%^43555######165&^vv^%^|
+| Customer ID |    Product Information    | Product ID | Purchase Date | Quantity | Price Per Gallon | Transactions |                Column8                |
+|:-----------:|:-------------------------:|:----------:|:-------------:|:--------:|:----------------:|:------------:|:-------------------------------------:|
+|   C-685251  |    Isopropyl Alcohol      |   P-15586  |   1/1/2022    |  42905   |      $154.74     |    42905     | #$%^%^42905######154.74&^vv^%^         |
+|   C-684988  |       Glycol Ethers       |   P-16484  |   1/2/2022    |  7517    |      $89.46      |    7517      | #$%^%^7517######89.46&^vv^%^           |
+|   C-685080  |    Sodium Hydroxide       |   P-12810  |   1/3/2022    |  9741    |      $76.86      |    9741      | #$%^%^9741######76.86&^vv^%^           |
+|   C-685914  |    Sodium Hydroxide       |   P-12810  |   1/4/2022    |  23241   |      $76.86      |    23241     | #$%^%^23241######76.86&^vv^%^          |
+|   C-685174  |       Glycol Ethers       |   P-16484  |   1/5/2022    |  25989   |      $89.46      |    25989     | #$%^%^25989######89.46&^vv^%^          |
 
 
-After importing, we can see that our data is not terribly dirty,
-however, it does require some cleaning and organization.
+After tidying up via ```Excel``` and importing, we can see that our data is not terribly dirty,
+however, it does require some cleaning and possible manipulation.
 
-The first observation I can see is that the data is not organized via ```Order_Date```,
-this may cause confusion and possible mistakes when reporting and recording transaction records. 
+Firstly, the column names might be a problem due to the spaces present.
+Errors might occur if hidden spaces such as "Quantity " exist.
+Also when creating queries, always typing "Quantity " during a code will be tedious.
+We can change the names by committing the query below:
 
-The second observation I can see is that possibly when organizing, importing,
+[In]
+``` sql //
+ALTER TABLE chemical_transactions cd
+RENAME COLUMN Customer ID TO customer_id
+
+ALTER TABLE chemical_transactions cd
+RENAME COLUMN Product Information TO product_information
+
+ALTER TABLE chemical_transactions cd
+RENAME COLUMN Product ID TO product_id
+
+ALTER TABLE chemical_transactions cd
+RENAME COLUMN Purchase Date TO purchase_date
+
+ALTER TABLE chemical_transactions cd
+RENAME COLUMN Quantity  TO purchase_quantity
+
+ALTER TABLE chemical_transactions cd
+RENAME COLUMN Price Per Gallon TO price_per_gallon
+```
+[Out]
+
+**Depending on the platform, these queries may have to be done all separately, however, whatever the result is, the way to name change is more or less the same!**
+
+Additionally, I can see that possibly when organizing, importing,
 or crafting the dataframe, two extra columns were added
 that contain repeated and glitched information.
 
@@ -84,19 +139,20 @@ DROP COLUMN
 SELECT *
 FROM 
     chemical_transactions ct
-ORDER BY RANDOM()
 LIMIT 5
 ```
 [Out]
 
-```sql
 | Customer ID | Product Information | Product ID | Purchase Date | Quantity | Price Per Gallon |
 |:-----------:|:-------------------:|:----------:|:-------------:|:--------:|:----------------:|
-|   C-685421  |   Hydrogen Peroxide |   P-17889  |    9/2/2022   |  67880   |      $57.89      |
-|   C-685487  |   Hydrogen Peroxide |   P-17889  |   1/30/2022   |  62793   |      $57.89      |
-|   C-685510  |     Glycol Ethers   |   P-16484  |   11/13/2023  |  48106   |      $89.46      |
-|   C-685230  |  Sodium Hydroxide   |   P-12810  |   12/1/2023   |  49050   |      $76.86      |
-|   C-685519  |  Hydrochloric Acid  |   P-13770  |   3/27/2022   |  49902   |      $165.00     |
-```
+| C-685251    | Isopropyl Alcohol   | P-15586    | 1/1/2022      | 42905    | $154.74          |
+| C-684988    | Glycol Ethers       | P-16484    | 1/2/2022      | 7517     | $89.46           |
+| C-685080    | Sodium Hydroxide    | P-12810    | 1/3/2022      | 9741     | $76.86           |
+| C-685914    | Sodium Hydroxide    | P-12810    | 1/4/2022      | 23241    | $76.86           |
+| C-685174    | Glycol Ethers       | P-16484    | 1/5/2022      | 25989    | $89.46           |
 
-Using the three separate ```SQL``` commands, we can isolate our data
+Using the three separate ```SQL``` commands, we can trim our data and make it far more malleable.
+Now that it's been clean,
+we can manipulate our DataFrame and answer questions to better visualize consumer and product data. 
+
+## 
