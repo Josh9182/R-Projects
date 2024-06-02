@@ -47,14 +47,7 @@ to fill in any null values that correlate with product type.
 
 [Out]
 
-**All product types will have the correct ID associated with their type.** 
-
-Additionally, it seems that the column organizing our data by date,
-```Purchase Date``` is unorganized and lacking an order.
-To fix this we can simply click the column, ```Purchase Date```,
-right-click the selected column and sort by either ```largest -> smallest``` or ```smallest -> largest```.
-In our case this data will be ascending, so the ```smallest -> largest``` will be picked.
-Now our data is ready for SQL import.  
+**All product types will have the correct ID associated with their type.**
 
 ## SQL Manipulation
 
@@ -97,19 +90,19 @@ ALTER TABLE chemical_transactions
 RENAME COLUMN "Customer ID" TO customer_id;
 
 ALTER TABLE chemical_transactions
-RENAME COLUMN "Product Information" TO product_info;
+RENAME COLUMN " Product Information" TO product_info;
 
 ALTER TABLE chemical_transactions
-RENAME COLUMN "Product ID" TO product_id;
+RENAME COLUMN " Product ID" TO product_id;
 
 ALTER TABLE chemical_transactions
-RENAME COLUMN "Purchase Date" TO purchase_date;
+RENAME COLUMN " Purchase Date" TO purchase_date;
 
 ALTER TABLE chemical_transactions
-RENAME COLUMN "Quantity" TO purchase_quantity;
+RENAME COLUMN " Quantity" TO purchase_quantity;
 
 ALTER TABLE chemical_transactions
-RENAME COLUMN "Price Per Gallon" TO gallon_price;
+RENAME COLUMN " Price Per Gallon" TO gallon_price;
 
 COMMIT;
 ```
@@ -150,12 +143,18 @@ SET customer_id = TRIM("customer_id")
 -- Removing commas from numerical columns
 
 UPDATE chemical_transactions cd
-SET product_quantity = REPLACE(product_quantity, ',', '');
+SET product_quantity = REPLACE(product_quantity, ',', '')
 
 -- Removing "$" from numerical columns
 
-UPDATE DIRTY_chemical_transactions 
+UPDATE chemical_transactions cd
 SET gallon_price = REPLACE(gallon_price, "$", "")
+
+-- Converting MM/DD/YYYY format into YYYY/MM/DD (When sorting, it focuses on the 1st position of the str.)
+
+UPDATE chemical_transactions cd
+SET purchase_date = SUBSTR(purchase_date , 7, 4) || '/' || SUBSTR(purchase_date , 1, 2) || '/' || SUBSTR(purchase_date , 4, 2)
+WHERE purchase_date LIKE '__/__/____'
 
 COMMIT;
 ```
