@@ -122,7 +122,7 @@ COMMIT;
 
 Once the columns have been correctly renamed for clarity's sake, cleaning the data to avoid future errors will be the next step.
 
-Several data cleaning tactics will be used. Such as dropping unnecessary columns, trimming white space, removing unnecessary punctuation from numerical data, converting string data to lowercase, removing any other possible NULL values, and converting any data type columns into the correct calculable format. 
+Several data cleaning tactics will be used. Such as dropping unnecessary columns, trimming white space, removing unnecessary punctuation from numerical data, converting any data type columns into the correct calculable format, and removing any other possible NULL values. 
 
 With each tidying query the ```UPDATE``` clause will be used to permanently manipulate our function.
 
