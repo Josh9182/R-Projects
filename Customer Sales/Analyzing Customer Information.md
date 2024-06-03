@@ -24,10 +24,12 @@ Below, we will answer several questions and highlight important milestones for o
 ### Customer Analysis
 * [Which of our customers are the top buyers?](#which-of-our-customers-are-the-top-buyers)
 * [Which of our customers are the bottom buyers?](#Which-of-our-customers-are-the-bottom-buyers)
+* [For each consumer, what is the purchase quantity and purchase value?](#For-each-consumer-what-is-the-purchase-quantity-and-purchase-value)
 * [What is the average purchase value per customer?]()
-### [Product Analysis]()
+### Product Analysis
 * [What are the most purchased products?]()
 * [What are the least purchased products?]()
+* [How has the sales volume changed over time for each product?]()
 * [Which products generate the highest revenue?]()
 * [Which products generate the least revenue?]()
 
@@ -342,3 +344,6 @@ LIMIT 10;
 |  C-685757   |  Hydrogen Peroxide  |       795        |
 |  C-685078   |    Glycol Ethers    |       839        |
 |  C-685187   |  Hydrogen Peroxide  |       868        |
+
+## For each consumer, what is the purchase quantity and purchase value?
+
