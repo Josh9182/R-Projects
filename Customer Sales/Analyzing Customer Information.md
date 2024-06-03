@@ -175,39 +175,49 @@ BEGIN;
 
 -- Trimming unnecessary white space
 
-UPDATE DIRTY_chemical_transactions
+UPDATE 
+  DIRTY_chemical_transactions
 SET customer_id = TRIM("customer_id");
 
-UPDATE DIRTY_chemical_transactions
+UPDATE 
+  DIRTY_chemical_transactions
 SET product_info = TRIM(product_info);
 
-UPDATE DIRTY_chemical_transactions
+UPDATE 
+  DIRTY_chemical_transactions
 SET product_id = TRIM(product_id);
 
-UPDATE DIRTY_chemical_transactions
+UPDATE 
+  DIRTY_chemical_transactions
 SET purchase_date = TRIM(purchase_date);
 
-UPDATE DIRTY_chemical_transactions
+UPDATE 
+  DIRTY_chemical_transactions
 SET purchase_quantity = TRIM(purchase_quantity);
 
-UPDATE DIRTY_chemical_transactions
+UPDATE 
+  DIRTY_chemical_transactions
 SET gallon_price = TRIM(gallon_price);
 
 -- Removing commas from numerical columns
 
-UPDATE DIRTY_chemical_transactions
+UPDATE 
+  DIRTY_chemical_transactions
 SET purchase_quantity = REPLACE(purchase_quantity, ',', '');
 
 -- Removing "$" from numerical columns
 
-UPDATE DIRTY_chemical_transactions
+UPDATE 
+  DIRTY_chemical_transactions
 SET gallon_price = REPLACE(gallon_price, "$", "");
 
 -- Converting MM/DD/YYYY format into YYYY/MM/DD (When sorting, it focuses on the 1st position of the str.)
 
-UPDATE DIRTY_chemical_transactions
+UPDATE 
+  DIRTY_chemical_transactions
 SET purchase_date = SUBSTR(purchase_date , 7, 4) || '/' || SUBSTR(purchase_date , 1, 2) || '/' || SUBSTR(purchase_date , 4, 2)
-WHERE purchase_date LIKE '__/__/____';
+WHERE 
+  purchase_date LIKE '__/__/____';
 
 COMMIT;
 ```
@@ -221,8 +231,31 @@ COMMIT;
 |  C-685208   | Sodium Hypochlorite |  P-14445   |  2023/03/31   |       8320        |    45.00     |
 |  C-685249   |  Hydrochloric Acid  |  P-13770   |  2022/07/30   |       43555       |    165.00    |
 
-Using the three separate ```SQL``` commands, we can trim our data and make it far more malleable.
-Now that it's been clean,
+Once all previous data cleaning techniques have been implemented, checking for NULL values will be the next endeavor.
+
+To check for NULL values we can check each column separately by the use of the query below. 
+
+[In]
+``` sql //
+SELECT *
+FROM 
+    DIRTY_chemical_transactions
+WHERE 
+  customer_id IS NULL
+  OR product_info IS NULL
+  OR product_id IS NULL
+  OR purchase_date IS NULL
+  OR purchase_quantity IS NULL
+  OR gallon_price IS NULL;
+```
+[Out]
+
+| customer_id | product_info | product_id | purchase_date | purchase_quantity | gallon_price |
+|:-----------:|:------------:|:----------:|:-------------:|:-----------------:|:------------:|
+
+It seems that our data has no NULL values! 
+
+Now that our data has been fully cleaned,
 we can manipulate our DataFrame and answer questions to better visualize consumer and product data. 
 
 ## 
