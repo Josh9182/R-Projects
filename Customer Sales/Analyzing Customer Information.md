@@ -300,4 +300,15 @@ LIMIT 10;
 
 Fantastic! After isolating our customers, preference, and purchase amount we can see a hierarchy of descending information ordered by the largest purchase amount.
 
-It seems that several customers breach the hundreds of thousands quantity of gallon purchases, 
+**It seems that several customers breached the hundreds of thousands quantity of gallon purchases as well as a noticeable popularity towards Glycol Ethers. 4/10 of the customers listed gravitated toward Glycol Ethers, showing a noticeable demand for said chemical.**   
+
+Due to this information we can theorize several possible correlations and ideas that might stem from this data. Seeing the top purchasers and as well as the chemical preference, we can offer far more promotions and marketing towards our customers who have a predominance towards one chemical as well as purchase amount and frequency. 
+
+Additionally, measuring the volume height of sales, depending on the product could indicate a higher demand/ lower demand. Further data will show which chemicals might be a more popular choice than others, however as of right now we can theorize what the demand is for each chemical based on the hierarchy above.
+
+Finding the purchase amount for each customer could help in regard to a more personalized marketing campaign. Possibly creating a hierarchical system in which promotions are laid out on every 10,000 or 20,000 gallons of product purchased. This could enhance customer satisfaction and overall loyalty to our company. 
+
+Lastly, seeing the top purchasers could help us, locate customer as well as product trends. This can be extremely beneficial as locating trends can allow us to avoid stock shortages and stay a float with customer demand.
+
+### Now that we have seen the top contributors of ChemTech's supply, locating and understanding the lowest purchasers would allow for even more important information.
+
