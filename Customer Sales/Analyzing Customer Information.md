@@ -305,13 +305,13 @@ Fantastic! After isolating our customers, preference, and purchase amount we can
 
 **It seems that several customers breached the hundreds of thousands quantity of gallon purchases as well as a noticeable popularity towards Glycol Ethers. 4/10 of the customers listed gravitated toward Glycol Ethers, showing a noticeable demand for said chemical.**   
 
-Due to this information we can theorize several possible correlations and ideas that might stem from this data. Seeing the top purchasers and as well as the chemical preference, we can offer far more promotions and marketing towards our customers who have a predominance towards one chemical as well as purchase amount and frequency. 
+Based off this information we can theorize several possible correlations and ideas that might stem from this data. Seeing the top purchasers and as well as the chemical preference, we can offer far more promotions and marketing towards our customers who have a predominance towards one chemical as well as purchase amount and frequency. 
 
 Additionally, measuring the volume height of sales, depending on the product could indicate a higher demand/ lower demand. Further data will show which chemicals might be a more popular choice than others, however as of right now we can theorize what the demand is for each chemical based on the hierarchy above.
 
 Finding the purchase amount for each customer could help in regard to a more personalized marketing campaign. Possibly creating a hierarchical system in which promotions are laid out on every 10,000 or 20,000 gallons of product purchased. This could enhance customer satisfaction and overall loyalty to our company. 
 
-Lastly, seeing the top purchasers could help us, locate customer as well as product trends. This can be extremely beneficial as locating trends can allow us to avoid stock shortages and stay a float with customer demand.
+Lastly, seeing the top purchasers could help us locate customer as well as product trends. This can be extremely beneficial as locating trends can allow us to avoid stock shortages and stay a float with customer demand.
 
 ### Now that we have seen the top contributors of ChemTech's supply, locating and understanding the lowest purchasers would allow for even more important information.
 
@@ -347,6 +347,20 @@ LIMIT 10;
 
 ## For each consumer, what is the purchase quantity and purchase value?
 
+After isolating our customers, preference, and purchase amount we can see a hierarchical demonstration of descending information ordered by the lowest purchase amounts.
+
+**The data above shows an interesting result, our company sells a staggering amount of chemicals to a variety of buyers whether it be 100,000+ gallons or 238. What is interesting is not the amount sold, but the preference. Whether it be industrial amounts or consumer amounts, most consumers seem to gravitate to Glycol Ethers. 3/10 consumers purchased Glycol Ethers, all 3 less than 1000 gallons. The other top contender was hydrogen peroxide with 3/10 consumers purchasing the chemical. Each purchase was less than 1000 gallons as well.**
+
+This data shows a possible hint to what the most popular products are, with this data providing us insight into what our customers appreciate the most. Whether the customers are industrial giants or educational institutions, our products seem to gather a wide array of appreciation as well as popularity.
+
+Based off this data, promotional opportunities can be marketed for frequent buyers or first time purchasers. This can be a way to garner a wider audience and create brand loyalty from the start.
+
+Additionally, a possible ad campaign targeted towards the most popular chemicals as well as the least popular chemicals could be a solution to boost customer satisfaction and brand popularity. However in order to launch said campaign we will need the exact preference numbers which will be found further down the line.
+
+### Now that we have seen the bottom most purchasers of ChemTech's products, we can find the exact transaction values for each consumer as well as the chemical type for each purchase. 
+
+## For each consumer, what is the purchase quantity and purchase value?
+
 [In]
 ``` sql //
 SELECT 
@@ -377,3 +391,4 @@ LIMIT 10;
 |  C-685723   | Hydrochloric Acid |     68,485      |   11,300,025   |
 |  C-685261   | Hydrochloric Acid |     68,247      |   11,260,755   |
 |  C-685651   | Hydrochloric Acid |     66,544      |   10,979,760   |
+
