@@ -347,3 +347,33 @@ LIMIT 10;
 
 ## For each consumer, what is the purchase quantity and purchase value?
 
+[In]
+``` sql //
+SELECT 
+  customer_id, 
+  product_info,
+  SUM(purchase_quantity) AS total_purchases, 
+  ROUND(SUM(purchase_quantity * gallon_price), 2) AS purchase_value
+FROM 
+  DIRTY_chemical_transactions 
+GROUP BY 
+  customer_id, 
+  product_info
+ORDER BY 
+  purchase_value DESC 
+LIMIT 10;
+```
+[Out]
+
+| customer_id |   product_info    | total_purchases | purchase_value |
+|:-----------:|:-----------------:|:---------------:|:--------------:|
+|  C-685251   | Isopropyl Alcohol |     233,329     | 36,105,329.46  |
+|  C-685102   |   Glycol Ethers   |     248,437     | 22,225,174.02  |
+|  C-685914   | Sodium Hydroxide  |     251,957     | 19,365,415.02  |
+|  C-685003   | Hydrochloric Acid |     69,860      |   11,526,900   |
+|  C-685531   | Hydrochloric Acid |     69,444      |   11,458,260   |
+|  C-685399   | Hydrochloric Acid |     69,227      |   11,422,455   |
+|  C-685921   | Hydrochloric Acid |     69,058      |   11,394,570   |
+|  C-685723   | Hydrochloric Acid |     68,485      |   11,300,025   |
+|  C-685261   | Hydrochloric Acid |     68,247      |   11,260,755   |
+|  C-685651   | Hydrochloric Acid |     66,544      |   10,979,760   |
