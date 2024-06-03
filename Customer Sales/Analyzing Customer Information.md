@@ -15,14 +15,14 @@ as well as product information (ID, quantity of sale, and price per gallon).
 
 Below, we will answer several questions and highlight important milestones for our data manipulation using PostgreSQL:
 
-### [Cleaning and Preprocessing](#Cleaning-and-Preprocessing)
+### Cleaning and Preprocessing
 * [Excel Functions](#Excel-Functions)
 * [SQL Manipulation](#SQL-Manipulation)
   * [Column Dropping](#Column-Dropping) 
   * [Column Renaming](#Column-Renaming)
   * [Data Tidying](#Data-Tidying)
-### [Customer Analysis]()
-* [Which of our customers are the top buyers?]()
+### Customer Analysis
+* [Which of our customers are the top buyers?](#which-of-our-customers-are-the-top-buyers)
 * [Which of our customers are the bottom buyers?]()
 * [What is the average purchase value per customer?]()
 ### [Product Analysis]()
@@ -65,13 +65,14 @@ LIMIT 5;
 ```
 [Out]
 
-| Customer ID | Product Information | Product ID | Purchase Date | Quantity | Price Per Gallon | Transactions |            Column8             |
-|:-----------:|:-------------------:|:----------:|:-------------:|:--------:|:----------------:|:------------:|:------------------------------:|
-|  C-685251   |  Isopropyl Alcohol  |  P-15586   |   1/1/2022    |  42905   |     $154.74      |    42905     | #$%^%^42905######154.74&^vv^%^ |
-|  C-684988   |    Glycol Ethers    |  P-16484   |   1/2/2022    |   7517   |      $89.46      |     7517     |  #$%^%^7517######89.46&^vv^%^  |
-|  C-685080   |  Sodium Hydroxide   |  P-12810   |   1/3/2022    |   9741   |      $76.86      |     9741     |  #$%^%^9741######76.86&^vv^%^  |
-|  C-685914   |  Sodium Hydroxide   |  P-12810   |   1/4/2022    |  23241   |      $76.86      |    23241     | #$%^%^23241######76.86&^vv^%^  |
-|  C-685174   |    Glycol Ethers    |  P-16484   |   1/5/2022    |  25989   |      $89.46      |    25989     | #$%^%^25989######89.46&^vv^%^  |
+| Customer ID | Product Information | Product ID | Purchase Date | Quantity | Price Per Gallon | Transactions |           Column8            |
+|:-----------:|:-------------------:|:----------:|:-------------:|:--------:|:----------------:|:------------:|:----------------------------:|
+|  C-685252   |    Glycol Ethers    |  P-16484   |  05/17/2023   |   238    |      $89.46      |     238      | #$%^%^238######89.46&^vv^%^  |
+|  C-685528   |    Glycol Ethers    |  P-16484   |  08/02/2023   |   267    |      $89.46      |     267      | #$%^%^267######89.46&^vv^%^  |
+|  C-685737   |  Isopropyl Alcohol  |  P-15586   |  02/08/2022   |   283    |     $154.74      |     283      | #$%^%^283######154.74&^vv^%^ |
+|  C-685763   |  Hydrogen Peroxide  |  P-17889   |  08/15/2022   |   295    |      $57.89      |     295      | #$%^%^295######57.89&^vv^%^  |
+|  C-685028   | Sodium Hypochlorite |  P-14445   |  01/24/2022   |   331    |      $45.00      |     331      |   #$%^%^331######45&^vv^%^   |
+
 
 After tidying up via ```Excel``` and importing, we can see that our data is not terribly dirty on the surface. 
 However, to make sure our future queries will be successful, cleaning and manipulation will be done to ensure perfection.
@@ -106,11 +107,11 @@ COMMIT;
 
 | Customer ID | Product Information | Product ID | Purchase Date | Quantity | Price Per Gallon |
 |:-----------:|:-------------------:|:----------:|:-------------:|:--------:|:----------------:|
-|  C-685251   |  Isopropyl Alcohol  |  P-15586   |   1/1/2022    |  42905   |     $154.74      |
-|  C-684988   |    Glycol Ethers    |  P-16484   |   1/2/2022    |   7517   |      $89.46      |
-|  C-685080   |  Sodium Hydroxide   |  P-12810   |   1/3/2022    |   9741   |      $76.86      |
-|  C-685914   |  Sodium Hydroxide   |  P-12810   |   1/4/2022    |  23241   |      $76.86      |
-|  C-685174   |    Glycol Ethers    |  P-16484   |   1/5/2022    |  25989   |      $89.46      |
+|  C-685252   |    Glycol Ethers    |  P-16484   |  2023-05-17   |   238    |      $89.46      |
+|  C-685528   |    Glycol Ethers    |  P-16484   |  2023-08-02   |   267    |      $89.46      |
+|  C-685737   |  Isopropyl Alcohol  |  P-15586   |  2022-02-08   |   283    |     $154.74      |
+|  C-685763   |  Hydrogen Peroxide  |  P-17889   |  2022-08-15   |   295    |      $57.89      |
+|  C-685028   | Sodium Hypochlorite |  P-14445   |  2022-01-24   |   331    |      $45.00      |
 
 ## Column Renaming
 
@@ -225,11 +226,11 @@ COMMIT;
 
 | customer_id |    product_info     | product_id | purchase_date | purchase_quantity | gallon_price |
 |:-----------:|:-------------------:|:----------:|:-------------:|:-----------------:|:------------:|
-|  C-685696   |    Glycol Ethers    |  P-16484   |  2022/04/08   |       25994       |    89.46     |
-|  C-685170   |  Sodium Hydroxide   |  P-12810   |  2022/04/02   |       4604        |    76.86     |
-|  C-685784   | Sodium Hypochlorite |  P-14445   |  2022/12/08   |       65256       |    45.00     |
-|  C-685208   | Sodium Hypochlorite |  P-14445   |  2023/03/31   |       8320        |    45.00     |
-|  C-685249   |  Hydrochloric Acid  |  P-13770   |  2022/07/30   |       43555       |    165.00    |
+|  C-685252   |    Glycol Ethers    |  P-16484   |  2023/05/17   |        238        |    89.46     |
+|  C-685528   |    Glycol Ethers    |  P-16484   |  2023/08/02   |        267        |    89.46     |
+|  C-685737   |  Isopropyl Alcohol  |  P-15586   |  2022/02/08   |        283        |    154.74    |
+|  C-685763   |  Hydrogen Peroxide  |  P-17889   |  2022/08/15   |        295        |    57.89     |
+|  C-685028   | Sodium Hypochlorite |  P-14445   |  2022/01/24   |        331        |    45.00     |
 
 Once all previous data cleaning techniques have been implemented, checking for NULL values will be the next endeavor.
 
@@ -253,9 +254,31 @@ WHERE
 | customer_id | product_info | product_id | purchase_date | purchase_quantity | gallon_price |
 |:-----------:|:------------:|:----------:|:-------------:|:-----------------:|:------------:|
 
-It seems that our data has no NULL values! 
+It seems that our data has no NULL values!
+
+# Customer Analysis
 
 Now that our data has been fully cleaned,
-we can manipulate our DataFrame and answer questions to better visualize consumer and product data. 
+we can manipulate our DataFrame and answer questions to better visualize consumer and product data.
 
-## 
+In this section, we will evaluate strictly customer related data to locate any important information from our customer data for future visualization.
+
+## Which of our customers are the top buyers?
+
+To start, an evaluation of our top buyers will be done. With this information we can eventually visualize the percentage of dominance certain buyers have as well as product preference. 
+
+[In]
+```sql // 
+SELECT 
+  customer_id,
+  product_info,
+  SUM(purchase_quantity) AS top_purchasers
+FROM 
+  DIRTY_chemical_transactions
+GROUP BY 
+  customer_id
+ORDER BY 
+  top_purchasers DESC
+LIMIT 5;
+```
+[Out]
