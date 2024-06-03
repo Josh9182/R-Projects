@@ -23,7 +23,7 @@ Below, we will answer several questions and highlight important milestones for o
   * [Data Tidying](#Data-Tidying)
 ### Customer Analysis
 * [Which of our customers are the top buyers?](#which-of-our-customers-are-the-top-buyers)
-* [Which of our customers are the bottom buyers?]()
+* [Which of our customers are the bottom buyers?](#Which-of-our-customers-are-the-bottom-buyers)
 * [What is the average purchase value per customer?]()
 ### [Product Analysis]()
 * [What are the most purchased products?]()
@@ -272,29 +272,30 @@ To start, an evaluation of our top buyers will be done. With this information we
 SELECT 
   customer_id,
   product_info,
-  SUM(purchase_quantity) AS top_purchasers
+  SUM(purchase_quantity) AS top_purchases
 FROM 
   DIRTY_chemical_transactions
 GROUP BY 
-  customer_id
+  customer_id, 
+  product_info
 ORDER BY 
-  top_purchasers DESC
+  top_purchases DESC
 LIMIT 10;
 ```
 [Out]
 
-| customer_id |    product_info     | top_purchasers |
-|:-----------:|:-------------------:|:--------------:|
-|  C-685914   |  Sodium Hydroxide   |    364,964     |
-|  C-685102   |    Glycol Ethers    |    248,437     |
-|  C-685251   |  Isopropyl Alcohol  |    233,329     |
-|  C-685538   | Sodium Hypochlorite |     95,592     |
-|  C-685684   |    Glycol Ethers    |     69,965     |
-|  C-685001   |  Hydrogen Peroxide  |     69,964     |
-|  C-685324   |    Glycol Ethers    |     69,863     |
-|  C-685003   |  Hydrochloric Acid  |     69,860     |
-|  C-685820   | Sodium Hypochlorite |     69,824     |
-|  C-685618   |    Glycol Ethers    |     69,593     |
+| customer_id |    product_info     | top_purchases |
+|:-----------:|:-------------------:|:-------------:|
+|  C-685914   |  Sodium Hydroxide   |    364,964    |
+|  C-685102   |    Glycol Ethers    |    248,437    |
+|  C-685251   |  Isopropyl Alcohol  |    233,329    |
+|  C-685538   | Sodium Hypochlorite |    95,592     |
+|  C-685684   |    Glycol Ethers    |    69,965     |
+|  C-685001   |  Hydrogen Peroxide  |    69,964     |
+|  C-685324   |    Glycol Ethers    |    69,863     |
+|  C-685003   |  Hydrochloric Acid  |    69,860     |
+|  C-685820   | Sodium Hypochlorite |    69,824     |
+|  C-685618   |    Glycol Ethers    |    69,593     |
 
 ## Which of our customers are the bottom buyers?
 
@@ -312,3 +313,32 @@ Lastly, seeing the top purchasers could help us, locate customer as well as prod
 
 ### Now that we have seen the top contributors of ChemTech's supply, locating and understanding the lowest purchasers would allow for even more important information.
 
+[In]
+``` sql //
+SELECT 
+  customer_id,
+  product_info,
+  SUM(purchase_quantity) AS bottom_purchases
+FROM 
+  DIRTY_chemical_transactions
+GROUP BY 
+  customer_id, 
+  product_info
+ORDER BY 
+  bottom_purchases DESC
+LIMIT 10;
+```
+[Out]
+
+| customer_id |    product_info     | bottom_purchases |
+|:-----------:|:-------------------:|:----------------:|
+|  C-685252   |    Glycol Ethers    |       238        |
+|  C-685528   |    Glycol Ethers    |       267        |
+|  C-685737   |  Isopropyl Alcohol  |       283        |
+|  C-685763   |  Hydrogen Peroxide  |       295        |
+|  C-685028   | Sodium Hypochlorite |       331        |
+|  C-685801   |  Hydrochloric Acid  |       767        |
+|  C-685608   |  Sodium Hydroxide   |       769        |
+|  C-685757   |  Hydrogen Peroxide  |       795        |
+|  C-685078   |    Glycol Ethers    |       839        |
+|  C-685187   |  Hydrogen Peroxide  |       868        |
