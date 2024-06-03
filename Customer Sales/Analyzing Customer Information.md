@@ -279,6 +279,25 @@ GROUP BY
   customer_id
 ORDER BY 
   top_purchasers DESC
-LIMIT 5;
+LIMIT 10;
 ```
 [Out]
+
+| customer_id |    product_info     | top_purchasers |
+|:-----------:|:-------------------:|:--------------:|
+|  C-685914   |  Sodium Hydroxide   |    364,964     |
+|  C-685102   |    Glycol Ethers    |    248,437     |
+|  C-685251   |  Isopropyl Alcohol  |    233,329     |
+|  C-685538   | Sodium Hypochlorite |     95,592     |
+|  C-685684   |    Glycol Ethers    |     69,965     |
+|  C-685001   |  Hydrogen Peroxide  |     69,964     |
+|  C-685324   |    Glycol Ethers    |     69,863     |
+|  C-685003   |  Hydrochloric Acid  |     69,860     |
+|  C-685820   | Sodium Hypochlorite |     69,824     |
+|  C-685618   |    Glycol Ethers    |     69,593     |
+
+## Which of our customers are the bottom buyers?
+
+Fantastic! After isolating our customers, preference, and purchase amount we can see a hierarchy of descending information ordered by the largest purchase amount.
+
+It seems that several customers breach the hundreds of thousands quantity of gallon purchases, 
