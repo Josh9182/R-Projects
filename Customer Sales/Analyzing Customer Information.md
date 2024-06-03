@@ -79,7 +79,6 @@ however, it does require some cleaning and possible manipulation.
 
 Firstly, the column names might be a problem due to the spaces present.
 Errors might occur if hidden spaces such as "Quantity " exist.
-Also, when creating queries, always typing "Quantity " during a code will be tedious.
 We can change the names by committing the query below:
 
 [In]
