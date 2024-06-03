@@ -4,7 +4,7 @@ In this notebook, we are going to analyze product data from 1000 transactions fr
 ChemTech is a chemical supply company
 specializing in cleaning chemicals for the purpose of machine preservation and maintenance.
 
-A CSV file full of consumer information and transaction data was brought to me to be organized, manipulated,
+A CSV file full of consumer information and transaction data was brought to be organized, manipulated,
 and analyzed for further EDA down the road.
 
 Our stakeholders are requesting a visualization of company-profit and sale numbers
