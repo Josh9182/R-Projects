@@ -357,9 +357,7 @@ Based off this data, promotional opportunities can be marketed for frequent buye
 
 Additionally, a possible ad campaign targeted towards the most popular chemicals as well as the least popular chemicals could be a solution to boost customer satisfaction and brand popularity. However in order to launch said campaign we will need the exact preference numbers which will be found further down the line.
 
-### Now that we have seen the bottom most purchasers of ChemTech's products, we can find the exact transaction values for each consumer as well as the chemical type for each purchase. 
-
-## For each consumer, what is the purchase quantity and purchase value?
+### Now that we have seen the bottom most purchasers of ChemTech's products, we can find the exact transaction values for each consumer as well as the chemical type for each purchase.
 
 [In]
 ``` sql //
