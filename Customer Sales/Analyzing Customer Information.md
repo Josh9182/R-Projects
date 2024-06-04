@@ -27,7 +27,7 @@ Below, we will answer several questions and highlight important milestones for o
 * [For each consumer, what is the purchase quantity and purchase value?](#For-each-consumer-what-is-the-purchase-quantity-and-purchase-value)
 ### Product Analysis
 * [What is the average purchase value and frequency of each product?](#what-is-the-average-purchase-value-and-frequency-of-each-product)
-* [What are the most / least purchased products?]()
+* [What are the most and least purchased products?](#what-are-the-most-and-least-purchased-products)
 * [How has the sales volume changed over time for each product?]()
 * [Which products generate the highest revenue?]()
 * [Which products generate the least revenue?]()
@@ -460,7 +460,7 @@ ORDER BY
 | Sodium Hypochlorite |      1,657,271.32      |        167        | 
 
 
-## What are the most / least purchased products?
+## What are the most and least purchased products?
 
 **When purchasing products from ChemTech,
 it seems that our customers gravitate towards a higher volume of certain products compared to others.
