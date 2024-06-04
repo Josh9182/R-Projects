@@ -26,9 +26,9 @@ Below, we will answer several questions and highlight important milestones for o
 * [Which of our customers are the bottom buyers?](#Which-of-our-customers-are-the-bottom-buyers)
 * [For each consumer, what is the purchase quantity and purchase value?](#For-each-consumer-what-is-the-purchase-quantity-and-purchase-value)
 ### Product Analysis
+* [What is the average purchase value and frequency of each product?](#what-is-the-average-purchase-value-and-frequency-of-each-product)
 * [What are the most purchased products?]()
 * [What are the least purchased products?]()
-* [What is the average purchase value for each product?]()
 * [How has the sales volume changed over time for each product?]()
 * [Which products generate the highest revenue?]()
 * [Which products generate the least revenue?]()
@@ -405,7 +405,7 @@ LIMIT 10;
 |  C-685261   | Hydrochloric Acid |     68,247      |   11,260,755   |
 |  C-685651   | Hydrochloric Acid |     66,544      |   10,979,760   |
 
-## What is the average purchase value per customer?
+## What is the average purchase value and frequency of each product?
 
 After isolating our customers as well as total purchases as well as purchase value,
 we can see our data organized via purchase value in descending order. 
@@ -434,13 +434,36 @@ Adding on to this idea, possible sales on related products or sales on frequency
 It is clear that Hydrochloric Acid is a contender for the most popular product in our lineup,
 however, future queries will dissect the product frequency and reveal the answer. 
 
-### After figuring out the purchase value of each customer, the ```Customer Analysis``` portion of the dissection has finished. We are now able to move onto the ```Product Analysis``` portion. To start, we will calculate the most purchased products to possibly identify any trends or patterns in customer preference.   
-
-## What is the average purchase value for every product?
+### After figuring out the purchase value of each customer, the ```Customer Analysis``` portion of the dissection has finished. We are now able to move onto the ```Product Analysis``` portion. To start, we will calculate the most purchased products to possibly identify any trends or patterns in customer preference.
 
 [In]
 ``` sql // 
-
-
+SELECT 
+  product_info, 
+  ROUND(AVG(purchase_quantity * gallon_price), 2) AS average_purchase_value,
+  COUNT(product_info) as product_frequency
+FROM 
+  DIRTY_chemical_transactions 
+GROUP BY 
+  product_info
+ORDER BY
+	average_purchase_value DESC
 ```
 [Out]
+
+|    product_info     | average_purchase_value | product_frequency | 
+|:-------------------:|:----------------------:|:-----------------:|
+|  Hydrochloric Acid  |      5,734,296.38      |        167        | 
+|  Isopropyl Alcohol  |      5,110,530.86      |        166        | 
+|    Glycol Ethers    |      3,193,073.68      |        166        | 
+|  Sodium Hydroxide   |      2,747,704.96      |        167        |
+|  Hydrogen Peroxide  |      1,927,970.3       |        166        | 
+| Sodium Hypochlorite |      1,657,271.32      |        167        | 
+
+
+## What are the most purchased products?
+
+**When purchasing products from ChemTech,
+it seems that our customers gravitate towards a higher volume of certain products compared to others.
+Notably Hydrochloric Acid and Isopropyl Alcohol are bought on average ** 
+
