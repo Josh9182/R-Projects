@@ -465,5 +465,26 @@ ORDER BY
 
 **When purchasing products from ChemTech,
 it seems that our customers gravitate towards a higher volume of certain products compared to others.
-Notably Hydrochloric Acid and Isopropyl Alcohol are bought on average ** 
+Notably Hydrochloric Acid and Isopropyl Alcohol are bought on average with the same frequency as other products
+however each purchase includes far more product.**
+
+**Based on the data, it seems that our products are divided into a 3-tier hierarchy: Top, Middle, Low priority.
+Hydrochloric Acid and Isopropyl Alcohol are the products that are in high demand.
+Glycol Ethers and Sodium Hydroxide are in middle demand.
+Lastly, Hydrogen Peroxide and Sodium Hypochlorite are in low demand.**
+
+It should be advised that both Hydrochloric Acid and Isopropyl Alcohol
+should be kept on high alert and monitored closely to avoid stock shortages.
+
+Additionally,
+possible pricing strategies could be revised to ensure competitive pricing on certain products.
+However, this should be carefully considered to ensure customer satisfaction and loyalty levels do not plummet.
+
+### The data above indicates that while ChemTech's customers enjoy all products at a similar frequency, the average purchase value of each purchase differs frequently, indicating a difference in demand across all products. The next endeavor will be figuring out which products have the highest purchase quantities as opposed to which products are bought on average the most in each purchase. 
+
+[In]
+``` sql //
+
+```
+[Out]
 
