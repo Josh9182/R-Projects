@@ -317,7 +317,6 @@ Lastly, seeing the top purchasers could help us locate customer as well as produ
 
 [In]
 ``` sql //
-CREATE TABLE bottom_purchasers AS
 SELECT 
   customer_id,
   product_info,
@@ -329,15 +328,8 @@ GROUP BY
   product_info
 ORDER BY 
   bottom_purchases DESC
-
-SELECT *
-FROM
- bottom_purchasers
 ```
 [Out]
-
-
-# MAKE EVERYTHING INTO A SEPARATE TABLE 
 
 | customer_id |    product_info     | bottom_purchases |
 |:-----------:|:-------------------:|:----------------:|
