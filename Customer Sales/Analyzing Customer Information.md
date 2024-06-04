@@ -25,10 +25,10 @@ Below, we will answer several questions and highlight important milestones for o
 * [Which of our customers are the top buyers?](#which-of-our-customers-are-the-top-buyers)
 * [Which of our customers are the bottom buyers?](#Which-of-our-customers-are-the-bottom-buyers)
 * [For each consumer, what is the purchase quantity and purchase value?](#For-each-consumer-what-is-the-purchase-quantity-and-purchase-value)
-* [What is the average purchase value per customer?]()
 ### Product Analysis
 * [What are the most purchased products?]()
 * [What are the least purchased products?]()
+* [What is the average purchase value for each product?]()
 * [How has the sales volume changed over time for each product?]()
 * [Which products generate the highest revenue?]()
 * [Which products generate the least revenue?]()
@@ -431,6 +431,16 @@ in which related products are suggested in a cross-selling strategy could allow 
 
 Adding on to this idea, possible sales on related products or sales on frequency could retain customer satisfaction.
 
-### It is clear that Hydrochloric Acid is a contender for a 
+It is clear that Hydrochloric Acid is a contender for the most popular product in our lineup,
+however, future queries will dissect the product frequency and reveal the answer. 
 
-## What is the average purchase value per customer?
+### After figuring out the purchase value of each customer, the ```Customer Analysis``` portion of the dissection has finished. We are now able to move onto the ```Product Analysis``` portion. To start, we will calculate the most purchased products to possibly identify any trends or patterns in customer preference.   
+
+## What is the average purchase value for every product?
+
+[In]
+``` sql // 
+
+
+```
+[Out]
