@@ -27,8 +27,7 @@ Below, we will answer several questions and highlight important milestones for o
 * [For each consumer, what is the purchase quantity and purchase value?](#For-each-consumer-what-is-the-purchase-quantity-and-purchase-value)
 ### Product Analysis
 * [What is the average purchase value and frequency of each product?](#what-is-the-average-purchase-value-and-frequency-of-each-product)
-* [What are the most purchased products?]()
-* [What are the least purchased products?]()
+* [What are the most / least purchased products?]()
 * [How has the sales volume changed over time for each product?]()
 * [Which products generate the highest revenue?]()
 * [Which products generate the least revenue?]()
@@ -461,7 +460,7 @@ ORDER BY
 | Sodium Hypochlorite |      1,657,271.32      |        167        | 
 
 
-## What are the most purchased products?
+## What are the most / least purchased products?
 
 **When purchasing products from ChemTech,
 it seems that our customers gravitate towards a higher volume of certain products compared to others.
@@ -484,7 +483,56 @@ However, this should be carefully considered to ensure customer satisfaction and
 
 [In]
 ``` sql //
-
+SELECT 
+  product_info, 
+  SUM(purchase_quantity) AS total_purchases
+FROM 
+  DIRTY_chemical_transactions
+GROUP BY 
+  product_info
+ORDER BY 
+  total_purchases DESC;
 ```
 [Out]
 
+|       product_info       | total_purchases |
+|:------------------------:|:---------------:|
+|   Sodium Hypochlorite    |    6,150,318    |
+|     Sodium Hydroxide     |    5,970,163    |
+|      Glycol Ethers       |    5,924,997    |
+|    Hydrochloric Acid     |    5,803,803    |
+|    Hydrogen Peroxide     |    5,528,469    |
+|    Isopropyl Alcohol     |    5,482,410    |
+
+## How has the sales volume changed over time for each product?
+
+Based on the products in our current inventory,
+we can see an organized DataFrame which shows which products are most popular among ChemTech customers.
+
+**Sodium Hypochlorite seems to be the leading product in our lineup in terms of purchase amount 
+with Isopropyl Alcohol showing up as the lowest.
+Comparing the top value to the bottom, we can see a 10.85% increase in purchase amount.**
+
+This insight is notable, as focusing on purchase amount of
+product volume allows us to measure the stocking frequency.
+Those of higher purchase volume should be marked down for a far more frequent restocking, 
+and those of lower should be monitored and maintained to avoid overstock.
+
+By the use of advertisements, possible giveaways, and or promotions,
+the popularity of some of our products can be manipulated to possibly boost sales further. 
+
+It is extremely important to note that those of higher demand will need to most likely change the delivery process.
+To meet customer expectations as well as expiration dates. 
+
+Comparing the data above, while all of our products are purchased at relatively the same frequency,
+each product is bought in varying quantities per transaction regardless of the frequency.
+
+The data shows that while some products, such as Hydrochloric Acid and Isopropyl Alcohol,
+are bought in high volumes per transaction,
+the most popular products in our inventory are Sodium Hypochlorite and Sodium Hydroxide.
+Although some products have a higher volume per transaction,
+the overall total quantity sold indicates greater popularity for products such as Sodium Hypochlorite and Sodium Hydroxide.
+
+### The data above indicates a staggering outcome which shows our most popular products based on the total purchases, odium Hypochlorite and Sodium Hydroxide. Now that popularity index of our products has been created as well as 
+transaction volume,
+using pattern analysis, we can discover how sale volume has changed over time for every single product.  
