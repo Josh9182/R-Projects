@@ -177,11 +177,9 @@ With each tidying query, the ```UPDATE``` & ```ALTER``` clause will be used to p
 ``` sql //
 BEGIN;
 
--- Trimming unnecessary white space
-
 UPDATE 
   DIRTY_chemical_transactions
-SET customer_id = TRIM("customer_id");
+SET customer_id = TRIM(customer_id);
 
 UPDATE 
   DIRTY_chemical_transactions
@@ -207,19 +205,19 @@ SET gallon_price = TRIM(gallon_price);
 
 UPDATE 
   DIRTY_chemical_transactions
-SET purchase_quantity = REPLACE(purchase_quantity, ',', '');
+SET purchase_quantity = REPLACE(purchase_quantity, ',' , '');
 
 -- Removing "$" from numerical columns
 
 UPDATE 
   DIRTY_chemical_transactions
-SET gallon_price = REPLACE(gallon_price, "$", "");
+SET gallon_price = REPLACE(gallon_price, '$', '');
 
 -- Converting MM/DD/YYYY format into YYYY/MM/DD (When sorting, it focuses on the 1st position of the str.)
 
 UPDATE 
   DIRTY_chemical_transactions
-SET purchase_date = SUBSTR(purchase_date , 7, 4) || '/' || SUBSTR(purchase_date , 1, 2) || '/' || SUBSTR(purchase_date , 4, 2)
+SET purchase_date = TO_CHAR(TO_DATE(SUBSTR(purchase_date, 1, 10), 'MM/DD/YYYY'), 'YYYY/MM/DD')
 WHERE 
   purchase_date LIKE '__/__/____';
 
@@ -412,10 +410,27 @@ LIMIT 10;
 After isolating our customers as well as total purchases as well as purchase value,
 we can see our data organized via purchase value in descending order. 
 
-**The data above shows several insights of note. Firstly, the most dominant chemical found in this sample is Hydrochloric Acid, with a preference dominance of 7/10 chemicals chosen. Based off this data the predominant idea of marketing/promotions will be definitely theorized to boost customer loyalty.**
+**The data above shows several insights of note.
+Firstly, the most dominant chemical found in this sample is Hydrochloric Acid,
+with a preference dominance of 7/10 chemicals chosen. 
+Based off this data the predominant idea of marketing/promotions will be definitely theorized
+to boost customer loyalty.**
 
-**The second insight noticed was found in the ```total_purchases``` column. While Hydrochloric Acid is the most popular chemical overall, the most purchased chemicals in general are in order Isopropyl Alcohol, Glycol Ethers, and Sodium Hydroxide. Based on this data, a promotion in which thousands, or possibly even hundreds of thousands of gallons can create a discount for total orders based off of bulk sale. Additionally, personalized advertisements, gifts, and giveaways can allow our customers a return on their loyalty and ensure customer satisfaction.**
+Additionally, I would look forward into the reasons for the popularity.
+Why do so many of our suppliers gravitate towards one product?
+It is pivotal that we keep in mind the demand for our products, so we do not endure a stock shortage.
 
-### Once the purchases as well as purchase values have been located for each customer, it's now important to finish our data 
+**The second insight noticed was found in the ```total_purchases``` column.
+While Hydrochloric Acid 
+is the most popular chemical overall,
+the most purchased chemicals in general are in order Isopropyl Alcohol, Glycol Ethers, and Sodium Hydroxide.**
+
+Based on this data,
+a possible promotion
+in which related products are suggested in a cross-selling strategy could allow for an increase in sale of other products.
+
+Adding on to this idea, possible sales on related products or sales on frequency could retain customer satisfaction.
+
+### It is clear that Hydrochloric Acid is a contender for a 
 
 ## What is the average purchase value per customer?
