@@ -533,6 +533,4 @@ the most popular products in our inventory are Sodium Hypochlorite and Sodium Hy
 Although some products have a higher volume per transaction,
 the overall total quantity sold indicates greater popularity for products such as Sodium Hypochlorite and Sodium Hydroxide.
 
-### The data above indicates a staggering outcome which shows our most popular products based on the total purchases, odium Hypochlorite and Sodium Hydroxide. Now that popularity index of our products has been created as well as 
-transaction volume,
-using pattern analysis, we can discover how sale volume has changed over time for every single product.  
+### The data above indicates a staggering outcome which shows our most popular products based on the total purchases, odium Hypochlorite and Sodium Hydroxide. Now that the popularity index of our products has been created as well as transaction volume, using pattern analysis, we can discover how sale volume has changed over time for every single product.  
