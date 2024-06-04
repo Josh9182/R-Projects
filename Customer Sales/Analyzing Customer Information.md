@@ -267,7 +267,7 @@ In this section, we will evaluate strictly customer related data to locate any i
 
 ## Which of our customers are the top buyers?
 
-To start, an evaluation of our top buyers will be done. With this information we can eventually visualize the percentage of dominance certain buyers have as well as product preference. 
+To start, an evaluation of our top buyers will be done. With this information we can eventually visualize the percentage of dominance certain buyers have as well as product preference. To further  
 
 [In]
 ```sql // 
@@ -317,6 +317,7 @@ Lastly, seeing the top purchasers could help us locate customer as well as produ
 
 [In]
 ``` sql //
+CREATE TABLE bottom_purchasers AS
 SELECT 
   customer_id,
   product_info,
@@ -328,9 +329,15 @@ GROUP BY
   product_info
 ORDER BY 
   bottom_purchases DESC
-LIMIT 10;
+
+SELECT *
+FROM
+ bottom_purchasers
 ```
 [Out]
+
+
+# MAKE EVERYTHING INTO A SEPARATE TABLE 
 
 | customer_id |    product_info     | bottom_purchases |
 |:-----------:|:-------------------:|:----------------:|
@@ -347,7 +354,7 @@ LIMIT 10;
 
 ## For each consumer, what is the purchase quantity and purchase value?
 
-After isolating our customers, preference, and purchase amount we can see a hierarchical demonstration of descending information ordered by the lowest purchase amounts.
+After isolating our customers, preferences, and purchase amount we can see a hierarchical demonstration of descending information ordered by the lowest purchase amounts.
 
 **The data above shows an interesting result, our company sells a staggering amount of chemicals to a variety of buyers whether it be 100,000+ gallons or 238. What is interesting is not the amount sold, but the preference. Whether it be industrial amounts or consumer amounts, most consumers seem to gravitate to Glycol Ethers. 3/10 consumers purchased Glycol Ethers, all 3 less than 1000 gallons. The other top contender was hydrogen peroxide with 3/10 consumers purchasing the chemical. Each purchase was less than 1000 gallons as well.**
 
@@ -390,3 +397,14 @@ LIMIT 10;
 |  C-685261   | Hydrochloric Acid |     68,247      |   11,260,755   |
 |  C-685651   | Hydrochloric Acid |     66,544      |   10,979,760   |
 
+## What is the average purchase value per customer?
+
+After isolating our customers as well as total purchases as well as purchase value we can see our data organized via purchase value in a descending order. 
+
+**The data above shows several insights of note. Firstly, the most dominant chemical found in this sample is Hydrochloric Acid, with a preference dominance of 7/10 chemicals chosen. Based off this data the predominant idea of marketing/promotions will be definitely theorized to boost customer loyalty.**
+
+**The second insight noticed was the found in the ```total_purchases``` column. While Hydrochloric Acid is the most popular chemical overall, the most purchased chemicals in general are in order Isopropyl Alchohol, Glycol Ethers, and Sodium Hydroxide. Based on this data, a promotion in which thousands, or possibly even hundreds of thousands of gallons can create a discount for total orders based off of bulk sale. Additionally, personalized advertisements, gifts, and giveaways can allow our customers a return on their loyalty and ensure customer satisfaction.**
+
+### Once the purchases as well as purchase values have been located for each customer, it's now important to finish our data 
+
+## What is the average purchase value per customer?
