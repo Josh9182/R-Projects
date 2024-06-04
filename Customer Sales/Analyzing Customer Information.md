@@ -81,7 +81,7 @@ However, to make sure our future queries will be successful, cleaning and manipu
 
 ## Column Dropping
 
-Firstly,  I can see that possibly when organizing, importing,
+Firstly, I can see that possibly when organizing, importing,
 or crafting the dataframe, two extra columns were added
 that contain repeated and glitched information.
 
@@ -117,9 +117,10 @@ COMMIT;
 
 ## Column Renaming
 
-Once the unnecessary columns were removed, an observation that was noticed was the column names. The column names might be a problem due to the spaces present such as "Product Information".
+Once the unnecessary columns were removed, an observation that was noticed was the column names.
+The column names might be a problem due to the spaces present such as "Product Information."
 
-Errors might occur if hidden spaces such as "Quantity " exist.
+Errors might occur if hidden spaces such as " Quantity" exist.
 We can change the names by committing the query below:
 
 [In]
@@ -236,7 +237,7 @@ COMMIT;
 
 Once all previous data cleaning techniques have been implemented, checking for NULL values will be the next endeavor.
 
-To check for NULL values we can check each column separately by the use of the query below. 
+To check for NULL values, we can check each column separately by the use of the query below. 
 
 [In]
 ``` sql //
@@ -267,7 +268,10 @@ In this section, we will evaluate strictly customer related data to locate any i
 
 ## Which of our customers are the top buyers?
 
-To start, an evaluation of our top buyers will be done. With this information we can eventually visualize the percentage of dominance certain buyers have as well as product preference. To further  
+To start, an evaluation of our top buyers will be done.
+With this information,
+we can eventually visualize the percentage of dominance certain buyers have as well as product preference.
+To further  
 
 [In]
 ```sql // 
@@ -301,13 +305,21 @@ LIMIT 10;
 
 ## Which of our customers are the bottom buyers?
 
-Fantastic! After isolating our customers, preference, and purchase amount we can see a hierarchy of descending information ordered by the largest purchase amount.
+Fantastic!
+After isolating our customers, preference, and purchase amount,
+we can see a hierarchy of descending information ordered by the largest purchase amount.
 
-**It seems that several customers breached the hundreds of thousands quantity of gallon purchases as well as a noticeable popularity towards Glycol Ethers. 4/10 of the customers listed gravitated toward Glycol Ethers, showing a noticeable demand for said chemical.**   
+**It seems that several customers breached the hundreds of thousands quantity of gallon purchases as well as noticeable popularity towards Glycol Ethers. 4/10 of the customers listed gravitated toward Glycol Ethers, showing a noticeable demand for said chemical.**   
 
-Based off this information we can theorize several possible correlations and ideas that might stem from this data. Seeing the top purchasers and as well as the chemical preference, we can offer far more promotions and marketing towards our customers who have a predominance towards one chemical as well as purchase amount and frequency. 
+Based on this information, we can theorize several possible correlations and ideas that might stem from this data.
+Seeing the top purchasers and as well as the chemical preference,
+we can offer far more promotions and marketing towards our customers
+who have a predominance towards one chemical as well as purchase amount and frequency. 
 
-Additionally, measuring the volume height of sales, depending on the product could indicate a higher demand/ lower demand. Further data will show which chemicals might be a more popular choice than others, however as of right now we can theorize what the demand is for each chemical based on the hierarchy above.
+Additionally, measuring the volume height of sales,
+depending on the product could indicate a higher demand/ lower demand.
+Further data will show which chemicals might be a more popular choice than others, however,
+as of right now we can theorize what the demand is for each chemical based on the hierarchy above.
 
 Finding the purchase amount for each customer could help in regard to a more personalized marketing campaign. Possibly creating a hierarchical system in which promotions are laid out on every 10,000 or 20,000 gallons of product purchased. This could enhance customer satisfaction and overall loyalty to our company. 
 
@@ -346,15 +358,21 @@ ORDER BY
 
 ## For each consumer, what is the purchase quantity and purchase value?
 
-After isolating our customers, preferences, and purchase amount we can see a hierarchical demonstration of descending information ordered by the lowest purchase amounts.
+After isolating our customers, preferences, and purchase amount,
+we can see a hierarchical demonstration of descending information ordered by the lowest purchase amounts.
 
-**The data above shows an interesting result, our company sells a staggering amount of chemicals to a variety of buyers whether it be 100,000+ gallons or 238. What is interesting is not the amount sold, but the preference. Whether it be industrial amounts or consumer amounts, most consumers seem to gravitate to Glycol Ethers. 3/10 consumers purchased Glycol Ethers, all 3 less than 1000 gallons. The other top contender was hydrogen peroxide with 3/10 consumers purchasing the chemical. Each purchase was less than 1000 gallons as well.**
+**The data above shows an interesting result, our company sells a staggering number of chemicals to a variety of buyers, whether it be 100,000+ gallons or 238. What is interesting is not the amount sold, but the preference. Whether it be industrial amounts or consumer amounts, most consumers seem to gravitate to Glycol Ethers. 3/10 consumers purchased Glycol Ethers, all 3 less than 1000 gallons. The other top contender was hydrogen peroxide with 3/10 consumers purchasing the chemical. Each purchase was less than 1000 gallons as well.**
 
 This data shows a possible hint to what the most popular products are, with this data providing us insight into what our customers appreciate the most. Whether the customers are industrial giants or educational institutions, our products seem to gather a wide array of appreciation as well as popularity.
 
 Based off this data, promotional opportunities can be marketed for frequent buyers or first time purchasers. This can be a way to garner a wider audience and create brand loyalty from the start.
 
-Additionally, a possible ad campaign targeted towards the most popular chemicals as well as the least popular chemicals could be a solution to boost customer satisfaction and brand popularity. However in order to launch said campaign we will need the exact preference numbers which will be found further down the line.
+Additionally,
+a possible ad campaign
+targeted towards the most popular chemicals as well as the least popular chemicals could be a solution
+to boost customer satisfaction and brand popularity.
+However, to launch a said campaign,
+we will need the exact preference numbers which will be found further down the line.
 
 ### Now that we have seen the bottom most purchasers of ChemTech's products, we can find the exact transaction values for each consumer as well as the chemical type for each purchase.
 
@@ -391,11 +409,12 @@ LIMIT 10;
 
 ## What is the average purchase value per customer?
 
-After isolating our customers as well as total purchases as well as purchase value we can see our data organized via purchase value in a descending order. 
+After isolating our customers as well as total purchases as well as purchase value,
+we can see our data organized via purchase value in descending order. 
 
 **The data above shows several insights of note. Firstly, the most dominant chemical found in this sample is Hydrochloric Acid, with a preference dominance of 7/10 chemicals chosen. Based off this data the predominant idea of marketing/promotions will be definitely theorized to boost customer loyalty.**
 
-**The second insight noticed was the found in the ```total_purchases``` column. While Hydrochloric Acid is the most popular chemical overall, the most purchased chemicals in general are in order Isopropyl Alchohol, Glycol Ethers, and Sodium Hydroxide. Based on this data, a promotion in which thousands, or possibly even hundreds of thousands of gallons can create a discount for total orders based off of bulk sale. Additionally, personalized advertisements, gifts, and giveaways can allow our customers a return on their loyalty and ensure customer satisfaction.**
+**The second insight noticed was found in the ```total_purchases``` column. While Hydrochloric Acid is the most popular chemical overall, the most purchased chemicals in general are in order Isopropyl Alcohol, Glycol Ethers, and Sodium Hydroxide. Based on this data, a promotion in which thousands, or possibly even hundreds of thousands of gallons can create a discount for total orders based off of bulk sale. Additionally, personalized advertisements, gifts, and giveaways can allow our customers a return on their loyalty and ensure customer satisfaction.**
 
 ### Once the purchases as well as purchase values have been located for each customer, it's now important to finish our data 
 
