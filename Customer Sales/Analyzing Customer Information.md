@@ -589,7 +589,7 @@ LIMIT 31
 
 ## Which products generate the highest and lowest revenue?
 
-**While this query is forced to be limited to one month for the sake of visualization, however,  
+**This query is forced to be limited to one month for the sake of visualization; however,  
 the actual query result will allow us a fantastic visualization later on.**
 
 Based off the snippet showing the purchase analytics of January 2022, several insights were revealed.
