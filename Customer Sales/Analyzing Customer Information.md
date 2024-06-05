@@ -544,7 +544,7 @@ SELECT
   SUM(purchase_quantity) as total_purchases,
   ROUND(SUM(purchase_quantity * gallon_price),2) as total_price
 FROM 
-  DIRTY_chemical_transactions dct
+  DIRTY_chemical_transactions
 GROUP BY 
   purchase_date
 ORDER BY
@@ -650,7 +650,7 @@ SELECT
   product_info,
   ROUND(SUM(purchase_quantity * gallon_price)) as purchase_value
 FROM 
-  DIRTY_chemical_transactions dct 
+  DIRTY_chemical_transactions 
 GROUP BY
   product_info
 ORDER BY 
@@ -668,3 +668,6 @@ ORDER BY
 | Sodium Hypochlorite |  553,528,620   |
 
 ## Conclusion: Data Restructuring
+
+
+
