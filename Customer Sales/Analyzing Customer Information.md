@@ -29,8 +29,10 @@ Below, we will answer several questions and highlight important milestones for o
 * [What is the average purchase value and frequency of each product?](#what-is-the-average-purchase-value-and-frequency-of-each-product)
 * [What are the most and least purchased products?](#what-are-the-most-and-least-purchased-products)
 * [How has the sales volume changed over time for each product?](#How-has-the-sales-volume-changed-over-time-for-each-product)
-* [Which products generate the highest revenue?]()
+* [Which products generate the highest revenue?](#Which-products-generate-the-highest-revenue)
 * [Which products generate the least revenue?]()
+### Conclusion
+* [Cleaned Data]()
 
 
 ## Cleaning and Preprocessing
@@ -534,4 +536,95 @@ the overall total quantity sold indicates greater popularity for products such a
 
 ### The data above indicates a staggering outcome which shows our most popular products based on the total purchases, Sodium Hypochlorite and Sodium Hydroxide. 
 
-### Now that the popularity index of our products has been created as well as transaction volume, it seems only fair to evaluate how time has affected our product sales. Using pattern analysis, we can discover how sale volume has changed over time for every single product.  
+### Now that the popularity index of our products has been created as well as transaction volume, it seems only fair to evaluate how time has affected our product sales. Using pattern analysis, we can discover how sale volume has changed over time for every single product.
+
+[In]
+``` sql //
+SELECT 
+  purchase_date,
+  SUM(purchase_quantity) as total_purchases,
+  ROUND(SUM(purchase_quantity * gallon_price),2) as total_price
+FROM 
+  DIRTY_chemical_transactions dct
+GROUP BY 
+  purchase_date
+ORDER BY
+  purchase_date ASC
+LIMIT 31
+```
+[Out]
+
+| purchase_date | total_purchases | purchase_value |
+|:-------------:|:---------------:|:--------------:|
+|  2022/01/01   |     85,810      |  13,278,239.4  |
+|  2022/01/02   |     15,034      |  1,344,941.64  |
+|  2022/01/03   |     19,482      |  1,497,386.52  |
+|  2022/01/04   |     46,482      |  3,572,606.52  |
+|  2022/01/05   |     51,978      |  4,649,951.88  |
+|  2022/01/06   |     83,602      |  6,425,649.72  |
+|  2022/01/07   |     42,440      |  3,261,938.4   |
+|  2022/01/08   |     80,014      |  4,632,010.46  |
+|  2022/01/09   |     35,386      |  2,048,495.54  |
+|  2022/01/10   |     86,090      |  13,321,566.6  |
+|  2022/01/11   |     38,776      |  2,244,742.64  |
+|  2022/01/12   |     88,624      |  7,928,303.04  |
+|  2022/01/13   |     55,710      |  3,225,051.9   |
+|  2022/01/14   |     130,894     |   5,890,230    |
+|  2022/01/15   |     74,430      |   3,349,350    |
+|  2022/01/16   |     124,940     |   20,615,100   |
+|  2022/01/17   |     40,368      |  2,336,903.52  |
+|  2022/01/18   |     11,118      |   643,621.02   |
+|  2022/01/19   |      1,810      |   161,922.6    |
+|  2022/01/20   |     100,406     |  8,982,320.76  |
+|  2022/01/21   |     12,414      |   718,646.46   |
+|  2022/01/22   |     136,776     |  7,917,962.64  |
+|  2022/01/23   |     86,394      | 13,368,607.56  |
+|  2022/01/24   |       662       |     29,790     |
+|  2022/01/25   |     95,666      |   15,784,890   |
+|  2022/01/26   |     138,012     |  7,989,514.68  |
+|  2022/01/27   |     57,574      |   2,590,830    |
+|  2022/01/28   |      5,508      |   423,344.88   |
+|  2022/01/29   |     50,534      |  7,819,631.16  |
+|  2022/01/30   |     125,586     |  7,270,173.54  |
+|  2022/01/31   |     39,250      |   3,511,305    |
+
+## Which products generate the highest revenue?
+
+**While this query is forced to be limited to one month for the sake of visualization, however,  
+the actual query result will allow us a fantastic visualization later on.**
+
+Based off the snippet showing the purchase analytics of January 2022, several insights were revealed.
+It seems throughout the month
+several occasions of large orders between 80–130k gallons are purchased between separated by 2–5 days,
+leading to a trend.
+
+**Additionally, it is to note that 10/14 days of large orders are experienced on even dates,
+showing a larger preference towards dates that are the day after.
+Most notably, 01/19/2022 encountered 1,810 gallons purchased, compared to the day after, showing 100,406.**
+
+This pattern should be highly monitored
+as highlighting off / on days could be a gateway to possible promotional measures
+in which days of the week that receive fewer orders can be set to discount products by 20%.
+
+**Peak days are also of note, days shown above such as 1/14/2022,
+1/20/2022, 1/22/2022, 1/26/2022, and 1/30/2022 all saw orders of over 100,000+.
+On the contrary, days such as 01/02/2022, 01/03/2022, 01/18/2022,
+01/19/2022, 01/21/2022, 01/24/2022, 01/28/2022 all saw orders less than 20,000.**
+
+Another instance in which promotional measures could be used to boost product sales.
+Days that on average receive fewer orders by a certain time of day should be allowed a possible discount
+to increase customer activity.
+
+Correlative data can be gathered from the columns ```total_purchases```
+& ```purchase_value``` in which some days received far more or less orders and still showed a higher profit.
+
+| purchase_date | total_purchases | purchase_value |
+|:-------------:|:---------------:|:--------------:|
+|  2022/01/04   |     46,482      |  3,572,606.52  |
+|  2022/01/13   |     55,710      |  3,225,051.9   |
+|  2022/01/15   |     74,430      |   3,349,350    |
+|  2022/01/27   |     57,574      |   2,590,830    |
+|  2022/01/29   |     50,534      |  7,819,631.16  |
+|  2022/01/31   |     39,250      |   3,511,305    |
+
+
