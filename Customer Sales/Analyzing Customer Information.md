@@ -674,8 +674,25 @@ starting with the 3-tier hierarchy mentioned previously which divides our produc
 
 **Starting with the top earners,
 Hydrochloric Acid and Isopropyl Alcohol seem to be the most lucrative and in demand products we supply.
-The total purchase value of our products combined is $6,783,399,917,
-in total our top earners contribute around 53% of this value.** 
+The total purchase value of our products combined is $6,783,399,917. 
+In total our top earners contribute to around 53% of this value.** 
+
+**Our mid-earners, Glycol Ethers and Sodium Hydroxide contribute to around 29% of the total purchase value.**
+
+**Lastly, our low-level earners, which are seen to be Hydrogen Peroxide and Sodium Hypochlorite. 
+These products contribute to about 18% of our total purchase value.**
+
+It's pivotal to keep in mind the demand rate for each product,
+the significant purchase popularity of our high earners indicates a significant want.
+This is extremely beneficial and matching the stock with the demand is crucial for us to not run into any problems.
+
+Possible analysis in the future in regard to regional desire could help
+further our knowledge on where to send and reserve our products.
+
+Possible marketing strategies, price increase/decrease,
+calculated discounts, and promotional material can be used to increase sale 
+
+
 
 
 
