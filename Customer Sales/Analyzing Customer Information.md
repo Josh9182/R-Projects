@@ -30,9 +30,8 @@ Below, we will answer several questions and highlight important milestones for o
 * [What are the most and least purchased products?](#what-are-the-most-and-least-purchased-products)
 * [How has the sales volume changed over time for each product?](#How-has-the-sales-volume-changed-over-time-for-each-product)
 * [Which products generate the highest and lowest revenue?](#Which-products-generate-the-highest-and-lowest-revenue)
-* [Which products generate the least revenue?]()
 ### Conclusion
-* [Cleaned Data]()
+* [Data Restructuring](#conclusion-data-restructuring)
 
 
 ## Cleaning and Preprocessing
@@ -667,3 +666,5 @@ ORDER BY
 |  Sodium Hydroxide   |  917,733,456   |
 |  Hydrogen Peroxide  |  640,086,141   |
 | Sodium Hypochlorite |  553,528,620   |
+
+## Conclusion: Data Restructuring
