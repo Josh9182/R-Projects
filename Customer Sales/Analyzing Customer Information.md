@@ -338,6 +338,7 @@ GROUP BY
   product_info
 ORDER BY 
   bottom_purchases DESC
+LIMIT 10
 ```
 [Out]
 
@@ -699,6 +700,13 @@ and promotional material can be used to increase sale growth and customer satisf
 
 ## To finish our data cleansing process, using CTE's we will combine all the queries we have made and turn the results into new and prepared data, ready for visualization. 
 
+[In]
+``` sql //
+
+
+
+```
+[Out]
 
 
 
