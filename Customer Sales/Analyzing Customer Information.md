@@ -669,5 +669,15 @@ ORDER BY
 
 ## Conclusion: Data Restructuring
 
+Several insights can be derived from the data above,
+starting with the 3-tier hierarchy mentioned previously which divides our products into tiers.
+
+**Starting with the top earners,
+Hydrochloric Acid and Isopropyl Alcohol seem to be the most lucrative and in demand products we supply.
+The total purchase value of our products combined is $6,783,399,917,
+in total our top earners contribute around 53% of this value.** 
+
+
+
 
 
