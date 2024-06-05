@@ -29,7 +29,7 @@ Below, we will answer several questions and highlight important milestones for o
 * [What is the average purchase value and frequency of each product?](#what-is-the-average-purchase-value-and-frequency-of-each-product)
 * [What are the most and least purchased products?](#what-are-the-most-and-least-purchased-products)
 * [How has the sales volume changed over time for each product?](#How-has-the-sales-volume-changed-over-time-for-each-product)
-* [Which products generate the highest revenue?](#Which-products-generate-the-highest-revenue)
+* [Which products generate the highest and lowest revenue?](#Which-products-generate-the-highest-and-lowest-revenue)
 * [Which products generate the least revenue?]()
 ### Conclusion
 * [Cleaned Data]()
@@ -588,7 +588,7 @@ LIMIT 31
 |  2022/01/30   |     125,586     |  7,270,173.54  |
 |  2022/01/31   |     39,250      |   3,511,305    |
 
-## Which products generate the highest revenue?
+## Which products generate the highest and lowest revenue?
 
 **While this query is forced to be limited to one month for the sake of visualization, however,  
 the actual query result will allow us a fantastic visualization later on.**
@@ -627,4 +627,43 @@ Correlative data can be gathered from the columns ```total_purchases```
 |  2022/01/29   |     50,534      |  7,819,631.16  |
 |  2022/01/31   |     39,250      |   3,511,305    |
 
+**Based on the isolated days I have picked, it shows staggering results.
+Days such as 01/04/2022 and 01/13/2022 share very similar purchase cost yet differ in purchase quantity by 9,228 gallons.**
 
+In keeping with this finding, a possible price increase could be in order on certain products to boost profit.
+This must be carefully considered as to not damage company reputation as well as customer satisfaction.
+
+**Additionally, 01/15/2022 and 01/29/2022 show massive differences in both purchase amount and cost. With a difference in purchase quantity of 23,896 gallons, as well as a difference in purchase cost of $4,470,281.6.**
+
+Derived from the data above,
+a further analysis on product v. profit can help
+us decide whether a price increase is necessary for certain products.
+Based on this data, it seems that it would be.
+However, over / undercharging would be dangerous for our company profits, customer loyalty, and overall reputation.
+
+### Peak days are seen to be apparent throughout the months observed, with certain days showing far more attention than others. The data indicates that even days often lead to more profit, which can be used to further our companies' sales by creating sales and discounts on products depending on the day of the week. 
+
+### As this is the start of the revenue analysis, understanding which products contribute most and least to our revenue, will allow us to better create a financial plan for possible product, pricing, and marketing restructure.
+
+[In]
+``` sql //
+SELECT 
+  product_info,
+  ROUND(SUM(purchase_quantity * gallon_price)) as purchase_value
+FROM 
+  DIRTY_chemical_transactions dct 
+GROUP BY
+  product_info
+ORDER BY 
+  purchase_value DESC 
+```
+[Out]
+
+|    product_info     | purchase_value |
+|:-------------------:|:--------------:|
+|  Hydrochloric Acid  | 1,915,254,990  |
+|  Isopropyl Alcohol  | 1,696,696,247  |
+|    Glycol Ethers    | 1,060,100,463  |
+|  Sodium Hydroxide   |  917,733,456   |
+|  Hydrogen Peroxide  |  640,086,141   |
+| Sodium Hypochlorite |  553,528,620   |
