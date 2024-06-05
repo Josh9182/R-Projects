@@ -690,7 +690,16 @@ Possible analysis in the future in regard to regional desire could help
 further our knowledge on where to send and reserve our products.
 
 Possible marketing strategies, price increase/decrease,
-calculated discounts, and promotional material can be used to increase sale 
+calculated discounts,
+and promotional material can be used to increase sale growth and customer satisfaction if planned accordingly. 
+
+### The data above indicates a 3-tier hierarchy in which financial results from each product have been listed and found to have fit the slots of a top, middle, low scale.
+
+### The demand for certain products outweighs others. To keep this in mind, each product and its corresponding demand rate should be calculated often. Based on the public preference, those of high demand should be restocked often and those of lesser demand should be restocked carefully as to not overstock.
+
+## To finish our data cleansing process, using CTE's we will combine all the queries we have made and turn the results into new and prepared data, ready for visualization. 
+
+
 
 
 
