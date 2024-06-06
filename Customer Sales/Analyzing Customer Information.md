@@ -338,7 +338,7 @@ GROUP BY
   product_info
 ORDER BY 
   bottom_purchases DESC
-LIMIT 10
+LIMIT 10;
 ```
 [Out]
 
@@ -448,7 +448,7 @@ FROM
 GROUP BY 
   product_info
 ORDER BY
-	average_purchase_value DESC
+	average_purchase_value DESC;
 ```
 [Out]
 
@@ -703,11 +703,224 @@ and promotional material can be used to increase sale growth and customer satisf
 [In]
 ``` sql //
 
+-- CTE creation that will combine all of our queries into one result that will be converted to a CSV to export.
 
+WITH top_purchases AS (
+    SELECT 
+      customer_id,
+      product_info,
+      SUM(purchase_quantity) AS top_purchases
+    FROM 
+      DIRTY_chemical_transactions
+    GROUP BY 
+      customer_id, 
+      product_info
+    ORDER BY 
+      top_purchases DESC
+    LIMIT 10
+),
+bottom_purchases AS (
+    SELECT 
+      customer_id,
+      product_info,
+      SUM(purchase_quantity) AS bottom_purchases
+    FROM 
+      DIRTY_chemical_transactions
+    GROUP BY 
+      customer_id, 
+      product_info
+    ORDER BY 
+      bottom_purchases DESC
+    LIMIT 10
+),
+total_purchase_value AS (
+    SELECT 
+      customer_id, 
+      product_info,
+      SUM(purchase_quantity) AS total_purchases, 
+      ROUND(SUM(purchase_quantity * gallon_price), 2) AS purchase_value
+    FROM 
+      DIRTY_chemical_transactions 
+    GROUP BY 
+      customer_id, 
+      product_info
+    ORDER BY 
+      purchase_value DESC 
+),
+average_purchase_value AS (
+    SELECT 
+      product_info, 
+      ROUND(AVG(purchase_quantity * gallon_price), 2) AS average_purchase_value,
+      COUNT(product_info) as product_frequency
+    FROM 
+      DIRTY_chemical_transactions 
+    GROUP BY 
+      product_info
+    ORDER BY
+      average_purchase_value DESC
+),
+total_purchases_per_product AS (
+    SELECT 
+      product_info, 
+      SUM(purchase_quantity) AS total_purchases
+    FROM 
+      DIRTY_chemical_transactions
+    GROUP BY 
+      product_info
+    ORDER BY 
+      total_purchases DESC
+),
+total_purchases_per_date AS (
+    SELECT 
+      purchase_date,
+      SUM(purchase_quantity) as total_purchases,
+      ROUND(SUM(purchase_quantity * gallon_price),2) as total_price
+    FROM 
+      DIRTY_chemical_transactions
+    GROUP BY 
+      purchase_date
+    ORDER BY
+      purchase_date ASC
+),
+purchase_value_per_product AS (
+    SELECT 
+      product_info,
+      ROUND(SUM(purchase_quantity * gallon_price)) as purchase_value
+    FROM 
+      DIRTY_chemical_transactions 
+    GROUP BY
+      product_info
+    ORDER BY 
+      purchase_value DESC
+)
 
+-- Once all queries have been organized, outputting the result will be commenced.
+-- For the sake of clarity, the result will be limited. The actual query will not. 
+
+SELECT * 
+FROM 
+  top_purchases
+LIMIT 10;
+    
+SELECT * 
+FROM 
+  bottom_purchases
+LIMIT 10;
+    
+SELECT * 
+FROM 
+  total_purchase_value
+LIMIT 10;
+    
+SELECT * 
+  FROM 
+    average_purchase_value
+LIMIT 10;
+    
+SELECT * 
+FROM 
+  total_purchases_per_product
+LIMIT 10;
+
+SELECT * 
+FROM 
+  total_purchases_per_date
+LIMIT 10;
+
+SELECT * 
+FROM 
+  purchase_value_per_product
+LIMIT 10;
 ```
 [Out]
 
+### top_purchases
+| customer_id |    product_info     | top_purchases |
+|:-----------:|:-------------------:|:-------------:|
+|  C-685914   |  Sodium Hydroxide   |    364,964    |
+|  C-685102   |    Glycol Ethers    |    248,437    |
+|  C-685251   |  Isopropyl Alcohol  |    233,329    |
+|  C-685538   | Sodium Hypochlorite |    95,592     |
+|  C-685684   |    Glycol Ethers    |    69,965     |
+|  C-685001   |  Hydrogen Peroxide  |    69,964     |
+|  C-685324   |    Glycol Ethers    |    69,863     |
+|  C-685003   |  Hydrochloric Acid  |    69,860     |
+|  C-685820   | Sodium Hypochlorite |    69,824     |
+|  C-685618   |    Glycol Ethers    |    69,593     |
+    
+### bottom_purchases
+| customer_id |    product_info     | bottom_purchases |
+|:-----------:|:-------------------:|:----------------:|
+|  C-685252   |    Glycol Ethers    |       238        |
+|  C-685528   |    Glycol Ethers    |       267        |
+|  C-685737   |  Isopropyl Alcohol  |       283        |
+|  C-685763   |  Hydrogen Peroxide  |       295        |
+|  C-685028   | Sodium Hypochlorite |       331        |
+|  C-685801   |  Hydrochloric Acid  |       767        |
+|  C-685608   |  Sodium Hydroxide   |       769        |
+|  C-685757   |  Hydrogen Peroxide  |       795        |
+|  C-685078   |    Glycol Ethers    |       839        |
+|  C-685187   |  Hydrogen Peroxide  |       868        |
+
+### total_purchase_value
+| customer_id |   product_info    | total_purchases | purchase_value |
+|:-----------:|:-----------------:|:---------------:|:--------------:|
+|  C-685251   | Isopropyl Alcohol |     233,329     | 36,105,329.46  |
+|  C-685102   |   Glycol Ethers   |     248,437     | 22,225,174.02  |
+|  C-685914   | Sodium Hydroxide  |     251,957     | 19,365,415.02  |
+|  C-685003   | Hydrochloric Acid |     69,860      |   11,526,900   |
+|  C-685531   | Hydrochloric Acid |     69,444      |   11,458,260   |
+|  C-685399   | Hydrochloric Acid |     69,227      |   11,422,455   |
+|  C-685921   | Hydrochloric Acid |     69,058      |   11,394,570   |
+|  C-685723   | Hydrochloric Acid |     68,485      |   11,300,025   |
+|  C-685261   | Hydrochloric Acid |     68,247      |   11,260,755   |
+|  C-685651   | Hydrochloric Acid |     66,544      |   10,979,760   |
+
+### average_purchase_value
+|    product_info     | average_purchase_value | product_frequency | 
+|:-------------------:|:----------------------:|:-----------------:|
+|  Hydrochloric Acid  |      5,734,296.38      |        167        | 
+|  Isopropyl Alcohol  |      5,110,530.86      |        166        | 
+|    Glycol Ethers    |      3,193,073.68      |        166        | 
+|  Sodium Hydroxide   |      2,747,704.96      |        167        |
+|  Hydrogen Peroxide  |      1,927,970.3       |        166        | 
+| Sodium Hypochlorite |      1,657,271.32      |        167        |
+
+### total_purchases_per_product
+|       product_info       | total_purchases |
+|:------------------------:|:---------------:|
+|   Sodium Hypochlorite    |    6,150,318    |
+|     Sodium Hydroxide     |    5,970,163    |
+|      Glycol Ethers       |    5,924,997    |
+|    Hydrochloric Acid     |    5,803,803    |
+|    Hydrogen Peroxide     |    5,528,469    |
+|    Isopropyl Alcohol     |    5,482,410    |
+
+### total_purchases_per_date
+| purchase_date | total_purchases | purchase_value |
+|:-------------:|:---------------:|:--------------:|
+|  2022/01/01   |     85,810      |  13,278,239.4  |
+|  2022/01/02   |     15,034      |  1,344,941.64  |
+|  2022/01/03   |     19,482      |  1,497,386.52  |
+|  2022/01/04   |     46,482      |  3,572,606.52  |
+|  2022/01/05   |     51,978      |  4,649,951.88  |
+|  2022/01/06   |     83,602      |  6,425,649.72  |
+|  2022/01/07   |     42,440      |  3,261,938.4   |
+|  2022/01/08   |     80,014      |  4,632,010.46  |
+|  2022/01/09   |     35,386      |  2,048,495.54  |
+|  2022/01/10   |     86,090      |  13,321,566.6  |
+ 
+### purchase_value_per_product
+|    product_info     | purchase_value |
+|:-------------------:|:--------------:|
+|  Hydrochloric Acid  | 1,915,254,990  |
+|  Isopropyl Alcohol  | 1,696,696,247  |
+|    Glycol Ethers    | 1,060,100,463  |
+|  Sodium Hydroxide   |  917,733,456   |
+|  Hydrogen Peroxide  |  640,086,141   |
+| Sodium Hypochlorite |  553,528,620   |
+
+## The CTE process has finished. Onto the next process in R!
 
 
 
