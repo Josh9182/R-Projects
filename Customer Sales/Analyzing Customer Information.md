@@ -337,7 +337,7 @@ GROUP BY
   customer_id, 
   product_info
 ORDER BY 
-  bottom_purchases DESC
+  bottom_purchases ASC
 LIMIT 10;
 ```
 [Out]
@@ -921,10 +921,3 @@ LIMIT 10;
 | Sodium Hypochlorite |  553,528,620   |
 
 ## The CTE process has finished. Onto the next process in R!
-
-
-
-
-
-
-
