@@ -56,6 +56,8 @@ to fill in any null values that correlate with product type.
 
 ## SQL Manipulation
 
+#### [Home](#ChemTech-Customer-Sales-and-Product-Analysis)
+
 SQL will be used to import the ```DIRTY_chemical_transactions.csv``` file into our SQL Database.
 For the sake of clarity,
 most if not all code outputs will be limited to between 5 & 15 results by the ```LIMIT``` function. 
@@ -119,6 +121,8 @@ COMMIT;
 
 ## Column Renaming
 
+#### [Home](#ChemTech-Customer-Sales-and-Product-Analysis)
+
 Once the unnecessary columns were removed, an observation that was noticed was the column names.
 The column names might be a problem due to the spaces present such as "Product Information."
 
@@ -167,6 +171,8 @@ COMMIT;
 |:-----------:|:------------:|:----------:|:-------------:|:-----------------:|:------------:|
 
 ## Data Tidying
+
+#### [Home](#ChemTech-Customer-Sales-and-Product-Analysis)
 
 Once the columns have been correctly renamed for clarity's sake, cleaning the data to avoid future errors will be the next step.
 
@@ -268,6 +274,8 @@ In this section, we will evaluate strictly customer related data to locate any i
 
 ## Which of our customers are the top buyers?
 
+#### [Home](#ChemTech-Customer-Sales-and-Product-Analysis)
+
 To start, an evaluation of our top buyers will be done.
 With this information,
 we can eventually visualize the percentage of dominance certain buyers have as well as product preference.
@@ -304,6 +312,8 @@ LIMIT 10;
 |  C-685618   |    Glycol Ethers    |    69,593     |
 
 ## Which of our customers are the bottom buyers?
+
+#### [Home](#ChemTech-Customer-Sales-and-Product-Analysis)
 
 Fantastic!
 After isolating our customers, preference, and purchase amount,
@@ -359,6 +369,8 @@ LIMIT 10;
 
 ## For each consumer, what is the purchase quantity and purchase value?
 
+#### [Home](#ChemTech-Customer-Sales-and-Product-Analysis)
+
 After isolating our customers, preferences, and purchase amount,
 we can see a hierarchical demonstration of descending information ordered by the lowest purchase amounts.
 
@@ -409,6 +421,8 @@ LIMIT 10;
 |  C-685651   | Hydrochloric Acid |     66,544      |   10,979,760   |
 
 ## What is the average purchase value and frequency of each product?
+
+#### [Home](#ChemTech-Customer-Sales-and-Product-Analysis)
 
 After isolating our customers as well as total purchases as well as purchase value,
 we can see our data organized via purchase value in descending order. 
@@ -465,6 +479,8 @@ ORDER BY
 
 ## What are the most and least purchased products?
 
+#### [Home](#ChemTech-Customer-Sales-and-Product-Analysis)
+
 **When purchasing products from ChemTech,
 it seems that our customers gravitate towards a higher volume of certain products compared to others.
 Notably Hydrochloric Acid and Isopropyl Alcohol are bought on average with the same frequency as other products
@@ -508,6 +524,8 @@ ORDER BY
 |    Isopropyl Alcohol     |    5,482,410    |
 
 ## How has the sales volume changed over time for each product?
+
+#### [Home](#ChemTech-Customer-Sales-and-Product-Analysis)
 
 Based on the products in our current inventory,
 we can see an organized DataFrame which shows which products are most popular among ChemTech customers.
@@ -592,6 +610,8 @@ LIMIT 31
 
 ## Which products generate the highest and lowest revenue?
 
+#### [Home](#ChemTech-Customer-Sales-and-Product-Analysis)
+
 **This query is forced to be limited to one month for the sake of visualization; however,  
 the actual query result will allow us a fantastic visualization later on.**
 
@@ -671,6 +691,8 @@ ORDER BY
 | Sodium Hypochlorite |  553,528,620   |
 
 ## Conclusion: Data Restructuring
+
+#### [Home](#ChemTech-Customer-Sales-and-Product-Analysis)
 
 Several insights can be derived from the data above,
 starting with the 3-tier hierarchy mentioned previously which divides our products into tiers.
@@ -923,3 +945,5 @@ LIMIT 10;
 | Sodium Hypochlorite |  553,528,620   |
 
 ## The CTE process has finished. Onto the next process in R!
+
+
