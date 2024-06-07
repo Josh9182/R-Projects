@@ -38,7 +38,7 @@ Below, we will answer several questions and highlight important milestones for o
 
 ### Excel Functions
 
-#### [Home](#ChemTech-is-a-chemical-supply-company)
+#### [Home](#ChemTech-Customer-Sales-and-Product-Analysis)
 
 Prior to any SQL usage, we can look over our data in ```Excel``` and check over any problems that may arise.
 It seems that there are several NULL values that exist within the ```Supplier_ID``` column!
