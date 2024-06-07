@@ -85,6 +85,8 @@ However, to make sure our future queries will be successful, cleaning and manipu
 
 ## Column Dropping
 
+#### [Home](#ChemTech-Customer-Sales-and-Product-Analysis)
+
 Firstly, I can see that possibly when organizing, importing,
 or crafting the dataframe, two extra columns were added
 that contain repeated and glitched information.
