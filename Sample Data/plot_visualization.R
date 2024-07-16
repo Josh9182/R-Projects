@@ -15,7 +15,8 @@ ui <- fluidPage(
     
     sidebarLayout(
         sidebarPanel(
-            fileInput("file", "Input your File (CSV, JSON, XLS, XLSX, ODS):", accept = c(".csv", ".json", ".xls", ".xlsx", ".ods")), 
+            fileInput("file", "Input your File (CSV, JSON, XLS, XLSX, ODS):", 
+                      accept = c(".csv", ".json", ".xls", ".xlsx", ".ods")), 
             checkboxGroupInput("x_value", "X Values:", choices = NULL), 
             selectInput("y_value", "Y Value:", choices = NULL), 
             sliderInput("xrange", "X Range:", min = 0, max = 1, value = c(0,1)), 
@@ -69,8 +70,10 @@ observe({
     numeric_data <- clean_dt() %>%
         select(where(is.numeric))
     
-    updateSliderInput(session, "xrange", min = min(numeric_data), max = max(numeric_data), value = c(min(numeric_data), max(numeric_data)))
-    updateSliderInput(session, "yrange", min = min(numeric_data), max = max(numeric_data), value = c(min(numeric_data), max(numeric_data)))})
+    updateSliderInput(session, "xrange", min = min(numeric_data), max = max(numeric_data), 
+        value = c(min(numeric_data), max(numeric_data)))
+    updateSliderInput(session, "yrange", min = min(numeric_data), max = max(numeric_data), 
+        value = c(min(numeric_data), max(numeric_data)))})
 
 output$plot_vis <- renderPlot({
     req(dt())
