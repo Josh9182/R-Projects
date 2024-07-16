@@ -47,3 +47,18 @@ server <- function(input, output, session) {
         
         else {
             stop("Unsupported file type. Please stick to the file requirements: CSV, JSON, XLS, XLSX, or ODS")}})
+            
+            clean_dt <- reactive({
+                req(dt())
+                
+                if (!is.null(dt()) && nrow() > 0 && ncol() > 0) {
+                dt() %>%
+                    na.omit() %>%
+                    mutate_if(is.character, function(x) str_to_lower(hunspell_suggest(trimws(x)))) %>%
+                    unique() %>%
+                    mutate_if(is.character, function(x) str_replace_all(x, ",", ""))}
+                else {
+                    stop("Empty Dataframe unable to visualize, please upload different file.")}})
+                              
+    output$cleaned_data <- renderPrint({
+        clean_dt()})}
