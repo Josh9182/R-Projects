@@ -72,14 +72,20 @@ observe({
     updateSliderInput(session, "xrange", min = min(numeric_data), max = max(numeric_data), value = c(min(numeric_data), max(numeric_data)))
     updateSliderInput(session, "yrange", min = min(numeric_data), max = max(numeric_data), value = c(min(numeric_data), max(numeric_data)))})
 
-output$plot_vis <- reactive({
+output$plot_vis <- renderPlot({
     req(dt())
     
     plot_dt <- clean_dt() %>%
-        select(input$x_value, input$y_value)
+        select(all_of(input$x_value, input$y_value))
     
     if (input$plot_type == "bar") {}
     
     else if (input$plot_type == "scatter") {}
     
     else if (input$plot_type == "pie") {}})
+
+output$plot_vis <- renderImage({
+    req(dt(), input$animated == "Yes")
+    
+    plot_dt <- clean_dt() %>%
+        select(all_of(input$x_value, input$y_value))})
