@@ -21,8 +21,8 @@ ui <- fluidPage(
             sliderInput("xrange", "X Range:", min = 0, max = 1, value = c(0,1)), 
             sliderInput("yrange", "Y Range:", min = 0, max = 1, value = c(0,1)),
             radioButtons("plot_type", "Plot Type:", choices = list("Bar Plot" = "bar",
-                                                                  "Scatter Plot" = "scatter",
-                                                                  "Pie Chart" = "pie")), 
+                                                                   "Scatter Plot" = "scatter",
+                                                                   "Pie Chart" = "pie")), 
             selectInput("animated", "Toggle Animated:", choices = c("Yes", "No"))), 
         
         mainPanel(
@@ -47,31 +47,39 @@ server <- function(input, output, session) {
         
         else {
             stop("Unsupported file type. Please stick to the file requirements: CSV, JSON, XLS, XLSX, or ODS")}})
-            
-            clean_dt <- reactive({
-                req(dt())
-                
-                if (!is.null(dt()) && nrow(dt()) > 0 && ncol(dt()) > 0) {
-                dt() %>%
-                    na.omit() %>%
-                    mutate_if(is.character, function(x) str_to_lower(hunspell_suggest(trimws(x)))) %>%
-                    unique() %>%
-                    mutate_if(is.character, function(x) str_replace_all(x, ",", ""))}
-                else {
-                    stop("Empty Dataframe unable to visualize, please upload different file.")}})
-            
-            
-    output$cleaned_data <- renderPlot({
-        clean_dt()})}
+    
+    clean_dt <- reactive({
+        req(dt())
+        
+        if (!is.null(dt()) && nrow(dt()) > 0 && ncol(dt()) > 0) {
+            dt() %>%
+                na.omit() %>%
+                mutate_if(is.character, function(x) str_to_lower(hunspell_suggest(trimws(x)))) %>%
+                unique() %>%
+                mutate_if(is.character, function(x) str_replace_all(x, ",", ""))}
+        else {
+            stop("Empty Dataframe unable to visualize, please upload different file.")}})
 
-    observe({
-        req(clean_dt())
-        
-        updateCheckboxGroupInput(session, "x_value", choices = colnames(clean_dt()), selected = colnames(clean_dt())[1])
-        updateSelectInput(session, "y_value", choices = colnames(clean_dt()), selected = colnames(clean_dt())[2])
-        
-        numeric_data <- clean_dt() %>%
-            select(where(is.numeric))
-        
-        updateSliderInput(session, "xrange", min = min(numeric_data), max = max(numeric_data), value = c(min(numeric_data), max(numeric_data)))
-        updateSliderInput(session, "yrange", min = min(numeric_data), max = max(numeric_data), value = c(min(numeric_data), max(numeric_data)))})
+observe({
+    req(clean_dt())
+    
+    updateCheckboxGroupInput(session, "x_value", choices = colnames(clean_dt()), selected = colnames(clean_dt())[1])
+    updateSelectInput(session, "y_value", choices = colnames(clean_dt()), selected = colnames(clean_dt())[2])
+    
+    numeric_data <- clean_dt() %>%
+        select(where(is.numeric))
+    
+    updateSliderInput(session, "xrange", min = min(numeric_data), max = max(numeric_data), value = c(min(numeric_data), max(numeric_data)))
+    updateSliderInput(session, "yrange", min = min(numeric_data), max = max(numeric_data), value = c(min(numeric_data), max(numeric_data)))})
+
+output$plot_vis <- reactive({
+    req(dt())
+    
+    plot_dt <- clean_dt() %>%
+        select(input$x_value, input$y_value)
+    
+    if (input$plot_type == "bar") {}
+    
+    else if (input$plot_type == "scatter") {}
+    
+    else if (input$plot_type == "pie") {}})
