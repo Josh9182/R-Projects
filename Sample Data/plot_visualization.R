@@ -3,7 +3,7 @@ library(ggplot2)
 library(gganimate)
 library(tidyr)
 library(tidyverse)
-library(JSONlite)
+library(jsonlite)
 library(readxl)
 library(readODS)
 
