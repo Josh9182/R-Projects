@@ -51,7 +51,7 @@ server <- function(input, output, session) {
             clean_dt <- reactive({
                 req(dt())
                 
-                if (!is.null(dt()) && nrow() > 0 && ncol() > 0) {
+                if (!is.null(dt()) && nrow(dt()) > 0 && ncol(dt()) > 0) {
                 dt() %>%
                     na.omit() %>%
                     mutate_if(is.character, function(x) str_to_lower(hunspell_suggest(trimws(x)))) %>%
@@ -60,5 +60,5 @@ server <- function(input, output, session) {
                 else {
                     stop("Empty Dataframe unable to visualize, please upload different file.")}})
                               
-    output$cleaned_data <- renderPrint({
+    output$cleaned_data <- renderPlot({
         clean_dt()})}
