@@ -7,6 +7,7 @@ library(tidyverse)
 library(jsonlite)
 library(readxl)
 library(readODS)
+library(hunspell)
 
 ui <- fluidPage(
     titlePanel("Plot Visualization"), 
