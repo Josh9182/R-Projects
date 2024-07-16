@@ -25,3 +25,23 @@ ui <- fluidPage(
         
         mainPanel(
             plotOutput("plot_vis"))))
+
+server <- function(input, output, session) {
+    dt <- reactive({
+        req(input$file)
+        file_ext <- file_ext(input$file$datapath)
+        
+        if (file_ext == "csv") {
+            read.csv(input$file$datapath)}
+        
+        else if (file_ext == "json") {
+            fromJSON(input$file$datapath)}
+        
+        else if (file_ext %in% c("xls", "xlsx")) {
+            read_xlsx(input$file$datapath)}
+        
+        else if (file_ext == "ods") {
+            read_ods(input$file$datapath)}
+        
+        else {
+            stop("Unsupported file type. Please stick to the file requirements: CSV, JSON, XLS, XLSX, or ODS")}})
