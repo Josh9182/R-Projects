@@ -59,6 +59,20 @@ server <- function(input, output, session) {
                     mutate_if(is.character, function(x) str_replace_all(x, ",", ""))}
                 else {
                     stop("Empty Dataframe unable to visualize, please upload different file.")}})
-                              
+            
+            
     output$cleaned_data <- renderPlot({
         clean_dt()})}
+
+    observe({
+        req(clean_dt())
+        
+        updateCheckboxGroupInput(session, "x_value", choices = colnames(clean_dt()), selected = colnames(clean_dt())[1])
+        updateSelectInput(session, "y_value", choices = colnames(clean_dt()), selected = colnames(clean_dt())[2])
+        
+        numeric_data <- clean_dt() %>%
+            select(where(is.numeric))
+        
+        updateSliderInput(session, "xrange", min = min(numeric_data), max = max(numeric_data), value = c(min(numeric_data), max(numeric_data)))
+        updateSliderInput(session, "yrange", min = min(numeric_data), max = max(numeric_data), value = c(min(numeric_data), max(numeric_data)))
+    })
