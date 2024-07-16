@@ -2,6 +2,7 @@ library(shiny)
 library(ggplot2)
 library(gganimate)
 library(tidyr)
+library(tools)
 library(tidyverse)
 library(jsonlite)
 library(readxl)
@@ -17,10 +18,10 @@ ui <- fluidPage(
             selectInput("y_value", "Y Value:", choices = NULL), 
             sliderInput("xrange", "X Range:", min = 0, max = 1, value = c(0,1)), 
             sliderInput("yrange", "Y Range:", min = 0, max = 1, value = c(0,1)),
-            radioButtons("plot_type", "Plot Type", choices = list("Bar Plot" = "bar",
+            radioButtons("plot_type", "Plot Type:", choices = list("Bar Plot" = "bar",
                                                                   "Scatter Plot" = "scatter",
                                                                   "Pie Chart" = "pie")), 
-            selectInput("animated", "Animated?", choices = c("Yes", "No"))), 
+            selectInput("animated", "Toggle Animated:", choices = c("Yes", "No"))), 
         
         mainPanel(
             plotOutput("plot_vis"))))
