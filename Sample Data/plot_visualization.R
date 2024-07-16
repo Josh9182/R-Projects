@@ -74,5 +74,4 @@ server <- function(input, output, session) {
             select(where(is.numeric))
         
         updateSliderInput(session, "xrange", min = min(numeric_data), max = max(numeric_data), value = c(min(numeric_data), max(numeric_data)))
-        updateSliderInput(session, "yrange", min = min(numeric_data), max = max(numeric_data), value = c(min(numeric_data), max(numeric_data)))
-    })
+        updateSliderInput(session, "yrange", min = min(numeric_data), max = max(numeric_data), value = c(min(numeric_data), max(numeric_data)))})
