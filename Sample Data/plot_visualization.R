@@ -79,7 +79,7 @@ server <- function(input, output, session) {
         req(dt())
     
     plot_dt <- clean_dt() %>%
-        select(all_of(input$x_value, input$y_value))
+        select(all_of(c(input$x_value, input$y_value)))
     
     if (input$plot_type == "bar") {}
     
