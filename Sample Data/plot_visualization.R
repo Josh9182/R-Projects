@@ -61,22 +61,22 @@ server <- function(input, output, session) {
         else {
             stop("Empty Dataframe unable to visualize, please upload different file.")}})
 
-observe({
-    req(clean_dt())
+    observe({
+        req(clean_dt())
     
-    updateCheckboxGroupInput(session, "x_value", choices = colnames(clean_dt()), selected = colnames(clean_dt())[1])
-    updateSelectInput(session, "y_value", choices = colnames(clean_dt()), selected = colnames(clean_dt())[2])
+        updateCheckboxGroupInput(session, "x_value", choices = colnames(clean_dt()), selected = colnames(clean_dt())[1])
+        updateSelectInput(session, "y_value", choices = colnames(clean_dt()), selected = colnames(clean_dt())[2])
     
-    numeric_data <- clean_dt() %>%
-        select(where(is.numeric))
+        numeric_data <- clean_dt() %>%
+            select(where(is.numeric))
     
-    updateSliderInput(session, "xrange", min = min(numeric_data), max = max(numeric_data), 
-        value = c(min(numeric_data), max(numeric_data)))
-    updateSliderInput(session, "yrange", min = min(numeric_data), max = max(numeric_data), 
-        value = c(min(numeric_data), max(numeric_data)))})
+        updateSliderInput(session, "xrange", min = min(numeric_data), max = max(numeric_data), 
+            value = c(min(numeric_data), max(numeric_data)))
+        updateSliderInput(session, "yrange", min = min(numeric_data), max = max(numeric_data), 
+            value = c(min(numeric_data), max(numeric_data)))})
 
-output$plot_vis <- renderPlot({
-    req(dt())
+    output$plot_vis <- renderPlot({
+        req(dt())
     
     plot_dt <- clean_dt() %>%
         select(all_of(input$x_value, input$y_value))
@@ -87,8 +87,8 @@ output$plot_vis <- renderPlot({
     
     else if (input$plot_type == "pie") {}})
 
-output$plot_vis <- renderImage({
-    req(dt(), input$animated == "Yes")
+    output$plot_vis <- renderImage({
+        req(dt(), input$animated == "Yes")
     
     plot_dt <- clean_dt() %>%
         select(all_of(input$x_value, input$y_value))})
