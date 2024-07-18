@@ -2,6 +2,7 @@ library(shiny)
 library(ggplot2)
 library(gganimate)
 library(tidyr)
+library(stringr)
 library(tools)
 library(tidyverse)
 library(jsonlite)
@@ -69,11 +70,13 @@ server <- function(input, output, session) {
         
         numeric_data <- clean_dt() %>%
             select(where(is.numeric))
+
+        if (ncol(numeric_data) > 0) {
         
         updateSliderInput(session, "xrange", min = min(numeric_data), max = max(numeric_data), 
                           value = c(min(numeric_data), max(numeric_data)))
         updateSliderInput(session, "yrange", min = min(numeric_data), max = max(numeric_data), 
-                          value = c(min(numeric_data), max(numeric_data)))})
+                          value = c(min(numeric_data), max(numeric_data)))}})
 
     output$plot_ui <- renderUI({
         req(filtered_dt())
