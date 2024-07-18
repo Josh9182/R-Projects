@@ -82,9 +82,11 @@ server <- function(input, output, session) {
             select(all_of(c(input$x_value, input$y_value)))
         
         if (input$plot_type == "bar") {
-            bar_plot <- ggplot(plot_dt, aes_string(x = input$x_value, y = input$y_value, fill = input$x_value)) +
+            ggplot(plot_dt, aes_string(x = input$x_value, y = input$y_value, fill = input$x_value)) +
                 geom_bar(stat = "identity", position = "dodge", linewidth = 1, color = "black") +
                 coord_flip() + 
+                xlim(input$xrange) + 
+                ylim(input$yrange) +
                 labs(title = paste(paste(input$x_value, sep = ", "), "by", input$y_value), x = paste(input$x_value, sep = ","), y = input$y_value) +
                 
                 theme_minimal() +
@@ -96,13 +98,14 @@ server <- function(input, output, session) {
                       plot.title = element_text(size = 25, hjust = -.5),
                       axis.title = element_text(size = 20),
                       legend.text = element_text(size = 15),
-                      legend.title = element_text(size = 18))
-            bar_plot}
+                      legend.title = element_text(size = 18))}
         
         else if (input$plot_type == "scatter") {
-            scatter_plot <- ggplot(plot_dt, aes_string(x = input$x_value, y = input$y_value, fill = input$x_value)) +
+            ggplot(plot_dt, aes_string(x = input$x_value, y = input$y_value, fill = input$x_value)) +
                 geom_point(size = 6, alpha = .8) +
                 coord_flip() + 
+                xlim(input$xrange) + 
+                ylim(input$yrange) +
                 labs(title = paste(paste(input$x_value, sep = ", "), "by", input$y_value), x = paste(input$x_value, sep = ","), y = input$y_value) +
                 
                 scale_color_gradient(low = "blue", high = "red") +
@@ -116,20 +119,20 @@ server <- function(input, output, session) {
                       plot.title = element_text(size = 25, hjust = -.5),
                       axis.title = element_text(size = 20),
                       legend.text = element_text(size = 15),
-                      legend.title = element_text(size = 18))
-            scatter_plot}
+                      legend.title = element_text(size = 18))}
         
         else if (input$plot_type == "pie") {
-            pie_plot <- ggplot(plot_dt, aes_string(x = "", y = input$y_value, fill = input$x_value)) +
+            ggplot(plot_dt, aes_string(x = "", y = input$y_value, fill = input$x_value)) +
                 geom_bar(stat = "identity", linewidth = 2, color = "white") +
                 coord_polar(theta = "y") +
+                xlim(input$xrange) + 
+                ylim(input$yrange) +
             labs(title = paste(input$y_value, "Pie Chart"), y = input$y_value, fill = input$x_value) +
                 
                 theme_minimal() +
                 theme(plot.title = element_text(size = 25, hjust = -.5),
                       legend.text = element_text(size = 15),
-                      legend.title = element_text(size = 18))
-            pie_plot}})
+                      legend.title = element_text(size = 18))}})
     
     output$plot_vis <- renderImage({
         req(dt(), input$animated == "Yes")
