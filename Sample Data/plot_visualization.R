@@ -27,7 +27,7 @@ ui <- fluidPage(
             selectInput("animated", "Toggle Animated:", choices = c("Yes", "No"))), 
         
         mainPanel(
-            plotOutput("plot_vis"))))
+            uiOutput("plot_vis"))))
 
 server <- function(input, output, session) {
     dt <- reactive({
@@ -74,9 +74,15 @@ server <- function(input, output, session) {
                           value = c(min(numeric_data), max(numeric_data)))
         updateSliderInput(session, "yrange", min = min(numeric_data), max = max(numeric_data), 
                           value = c(min(numeric_data), max(numeric_data)))})
+
+    output$plot_ui <- renderUI({
+        req(filtered_dt())
+        
+        if (input$animated == "No") {plotOutput("plot_vis")} 
+        else {imageOutput("animated_plot")}})
     
-    output$plot_vis <- renderPlot({
-        req(clean_dt(), input$animated == "No")
+    output$static_plot <- renderPlot({
+        req(filtered_dt(), input$animated == "No")
         
         plot_dt <- clean_dt() %>%
             select(all_of(c(input$x_value, input$y_value)))
@@ -85,8 +91,6 @@ server <- function(input, output, session) {
             ggplot(plot_dt, aes_string(x = input$x_value, y = input$y_value, fill = input$x_value)) +
                 geom_bar(stat = "identity", position = "dodge", linewidth = 1, color = "black") +
                 coord_flip() + 
-                xlim(input$xrange) + 
-                ylim(input$yrange) +
                 labs(title = paste(paste(input$x_value, sep = ", "), "by", input$y_value), x = paste(input$x_value, sep = ","), y = input$y_value) +
                 
                 theme_minimal() +
@@ -104,8 +108,6 @@ server <- function(input, output, session) {
             ggplot(plot_dt, aes_string(x = input$x_value, y = input$y_value, fill = input$x_value)) +
                 geom_point(size = 6, alpha = .8) +
                 coord_flip() + 
-                xlim(input$xrange) + 
-                ylim(input$yrange) +
                 labs(title = paste(paste(input$x_value, sep = ", "), "by", input$y_value), x = paste(input$x_value, sep = ","), y = input$y_value) +
                 
                 scale_color_gradient(low = "blue", high = "red") +
@@ -125,8 +127,6 @@ server <- function(input, output, session) {
             ggplot(plot_dt, aes_string(x = "", y = input$y_value, fill = input$x_value)) +
                 geom_bar(stat = "identity", linewidth = 2, color = "white") +
                 coord_polar(theta = "y") +
-                xlim(input$xrange) + 
-                ylim(input$yrange) +
             labs(title = paste(input$y_value, "Pie Chart"), y = input$y_value, fill = input$x_value) +
                 
                 theme_minimal() +
@@ -134,10 +134,10 @@ server <- function(input, output, session) {
                       legend.text = element_text(size = 15),
                       legend.title = element_text(size = 18))}})
     
-    output$plot_vis <- renderImage({
-        req(dt(), input$animated == "Yes")
+    output$anim_plot <- renderImage({
+        req(filtered_dt, input$animated == "Yes")
         
-        plot_dt <- clean_dt() %>%
+        plot_dt <- filtered_dt %>%
             select(all_of(input$x_value, input$y_value))
 
         if (input$plot_type == "bar") {
@@ -200,4 +200,6 @@ server <- function(input, output, session) {
             pp_animated + transition_states(input$x_value, transition_length = 1, state_length = 1) + 
             enter_grow() + exit_shrink()
             
-            animate(pp_animated, nframes = 100, fps = 20, renderer = gifski_renderer())}})
+            animate(pp_animated, nframes = 100, fps = 20, renderer = gifski_renderer())}})}
+
+shinyApp(ui = ui, server = server)
