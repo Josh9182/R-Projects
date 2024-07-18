@@ -97,7 +97,7 @@ server <- function(input, output, session) {
                       axis.title = element_text(size = 20),
                       legend.text = element_text(size = 15),
                       legend.title = element_text(size = 18))
-            print(bar_plot)}
+            bar_plot}
         
         else if (input$plot_type == "scatter") {
             scatter_plot <- ggplot(plot_dt, aes_string(x = input$x_value, y = input$y_value, fill = input$x_value)) +
@@ -117,7 +117,7 @@ server <- function(input, output, session) {
                       axis.title = element_text(size = 20),
                       legend.text = element_text(size = 15),
                       legend.title = element_text(size = 18))
-            print(scatter_plot)}
+            scatter_plot}
         
         else if (input$plot_type == "pie") {
             pie_plot <- ggplot(plot_dt, aes_string(x = "", y = input$y_value, fill = input$x_value)) +
@@ -129,7 +129,7 @@ server <- function(input, output, session) {
                 theme(plot.title = element_text(size = 25, hjust = -.5),
                       legend.text = element_text(size = 15),
                       legend.title = element_text(size = 18))
-            print(pie_plot)}})
+            pie_plot}})
     
     output$plot_vis <- renderImage({
         req(dt(), input$animated == "Yes")
@@ -137,7 +137,9 @@ server <- function(input, output, session) {
         plot_dt <- clean_dt() %>%
             select(all_of(input$x_value, input$y_value))
 
-        bp_animated <- bar_plot
+        bp_animated <- bar_plot + transition_states(input$x_value, transition_length = 1, state_length = 1) + 
+            enter_grow() + exit_shrink()
+            animate(bp_animated, nframes = 100, fps = 20, renderer = gifski_renderer())
 
         sp_animated
 
