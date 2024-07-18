@@ -137,12 +137,64 @@ server <- function(input, output, session) {
         plot_dt <- clean_dt() %>%
             select(all_of(input$x_value, input$y_value))
 
-        bp_animated <- bar_plot + transition_states(input$x_value, transition_length = 1, state_length = 1) + 
+        if (input$plot_type == "bar") {
+            bar_plot <- ggplot(plot_dt, aes_string(x = input$x_value, y = input$y_value, fill = input$x_value)) +
+                geom_bar(stat = "identity", position = "dodge", linewidth = 1, color = "black") +
+                coord_flip() + 
+                labs(title = paste(paste(input$x_value, sep = ", "), "by", input$y_value), x = paste(input$x_value, sep = ","), y = input$y_value) +
+                
+                theme_minimal() +
+                theme(panel.grid = element_line(linewidth = .5, color = "black"),
+                      axis.text.x = element_text(size = 15, face = "bold", color = "black", 
+                                                 margin = margin(b = 10)),
+                      axis.text.y = element_text(size = 15, face = "bold", color = "black", 
+                                                 margin = margin(l = 10)),
+                      plot.title = element_text(size = 25, hjust = -.5),
+                      axis.title = element_text(size = 20),
+                      legend.text = element_text(size = 15),
+                      legend.title = element_text(size = 18))
+            
+            bp_animated <- bar_plot + transition_states(input$x_value, transition_length = 1, state_length = 1) + 
             enter_grow() + exit_shrink()
-            animate(bp_animated, nframes = 100, fps = 20, renderer = gifski_renderer())
+            
+            animate(bp_animated, nframes = 100, fps = 20, renderer = gifski_renderer())}
 
-        sp_animated
+        else if (input$plot_type == "scatter") {
+            scatter_plot <- ggplot(plot_dt, aes_string(x = input$x_value, y = input$y_value, fill = input$x_value)) +
+                geom_point(size = 6, alpha = .8) +
+                coord_flip() + 
+                labs(title = paste(paste(input$x_value, sep = ", "), "by", input$y_value), x = paste(input$x_value, sep = ","), y = input$y_value) +
+                
+                scale_color_gradient(low = "blue", high = "red") +
+                
+                theme_minimal() +
+                theme(panel.grid = element_line(linewidth = .5, color = "black"),
+                      axis.text.x = element_text(size = 15, face = "bold", color = "black", 
+                                                 margin = margin(b = 10)),
+                      axis.text.y = element_text(size = 15, face = "bold", color = "black", 
+                                                 margin = margin(l = 10)),
+                      plot.title = element_text(size = 25, hjust = -.5),
+                      axis.title = element_text(size = 20),
+                      legend.text = element_text(size = 15),
+                      legend.title = element_text(size = 18))
+            
+            sp_animated + transition_states(input$x_value, transition_length = 1, state_length = 1) + 
+            enter_grow() + exit_shrink()
+            
+            animate(sp_animated, nframes = 100, fps = 20, renderer = gifski_renderer())}
 
-        pp_animated 
-        
-        })
+        else if (input$plot_type == "pie") {
+            pie_plot <- ggplot(plot_dt, aes_string(x = "", y = input$y_value, fill = input$x_value)) +
+                geom_bar(stat = "identity", linewidth = 2, color = "white") +
+                coord_polar(theta = "y") +
+            labs(title = paste(input$y_value, "Pie Chart"), y = input$y_value, fill = input$x_value) +
+                
+                theme_minimal() +
+                theme(plot.title = element_text(size = 25, hjust = -.5),
+                      legend.text = element_text(size = 15),
+                      legend.title = element_text(size = 18))
+            
+            pp_animated + transition_states(input$x_value, transition_length = 1, state_length = 1) + 
+            enter_grow() + exit_shrink()
+            
+            animate(pp_animated, nframes = 100, fps = 20, renderer = gifski_renderer())}})
