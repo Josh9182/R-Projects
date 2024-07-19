@@ -42,25 +42,13 @@ server <- function(input, output, session) {
            "ods" = read_ods(input$file$datapath), 
            stop("Incorrect file type. Please retry in the following format: CSV, JSON, XLSX, XLS, ODS."))})
     
-    clean_dt <- reactive({
-        req(dt())
-    
-        validate(
-            need(nrow(dt()) > 0, "Data table must have at least 1 row."),
-            need(ncol(dt()) > 0, "Data table must have at least 1 column."))
-            
-        dt() %>%
-            na.omit() %>%
-            unique() %>%
-            mutate(across(where(is.character)), ~ str_to_lower(trimws(.x)))})
-    
     observe({
-    req(clean_dt())
+    req(dt())
     
-    updateCheckboxGroupInput(session, "x_value", choices = colnames(clean_dt()), selected = colnames(clean_dt())[1])
-    updateSelectInput(session, "y_value", choices = colnames(clean_dt()), selected = colnames(clean_dt())[2])
+    updateCheckboxGroupInput(session, "x_value", choices = colnames(dt()), selected = colnames(dt())[1])
+    updateSelectInput(session, "y_value", choices = colnames(dt()), selected = colnames(dt())[2])
     
-    numeric_data <- clean_dt() %>%
+    numeric_data <- dt() %>%
         select(where(is.numeric))
     
     if (ncol(numeric_data) > 0) {
@@ -72,7 +60,7 @@ server <- function(input, output, session) {
         updateSliderInput(session, "yrange", min = numeric_min, max = numeric_max, 
                           value = c(numeric_min, numeric_max))}})
 
-    output$plot_ui <- renderUI({
+    output$plot_vis <- renderUI({
         req(filtered_dt())
         
         if (input$animated == "No") {
@@ -83,7 +71,7 @@ server <- function(input, output, session) {
     output$static_plot <- renderPlot({
         req(filtered_dt(), input$animated == "No")
         
-        plot_dt <- clean_dt() %>%
+        plot_dt <- dt() %>%
             select(all_of(c(input$x_value, input$y_value)))
         
         if (input$plot_type == "bar") {
