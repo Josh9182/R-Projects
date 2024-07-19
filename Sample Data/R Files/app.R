@@ -53,26 +53,30 @@ server <- function(input, output, session) {
             mutate(across(where(is.character)), ~ str_to_lower(trimws(.x)))})
     
     observe({
-        req(clean_dt())
+    req(clean_dt())
+    
+    updateCheckboxGroupInput(session, "x_value", choices = colnames(clean_dt()), selected = colnames(clean_dt())[1])
+    updateSelectInput(session, "y_value", choices = colnames(clean_dt()), selected = colnames(clean_dt())[2])
+    
+    numeric_data <- clean_dt() %>%
+        select(where(is.numeric))
+    
+    if (ncol(numeric_data) > 0) {
+        numeric_min <- min(numeric_data, na.rm = TRUE)
+        numeric_max <- max(numeric_data, na.rm = TRUE)
         
-        updateCheckboxGroupInput(session, "x_value", choices = colnames(clean_dt()), selected = colnames(clean_dt())[1])
-        updateSelectInput(session, "y_value", choices = colnames(clean_dt()), selected = colnames(clean_dt())[2])
-        
-        numeric_data <- clean_dt() %>%
-            select(where(is.numeric))
-
-        if (ncol(numeric_data) > 0) {
-        
-        updateSliderInput(session, "xrange", min = min(numeric_data), max = max(numeric_data), 
-                          value = c(min(numeric_data), max(numeric_data)))
-        updateSliderInput(session, "yrange", min = min(numeric_data), max = max(numeric_data), 
-                          value = c(min(numeric_data), max(numeric_data)))}})
+        updateSliderInput(session, "xrange", min = numeric_min, max = numeric_max, 
+                          value = c(numeric_min, numeric_max))
+        updateSliderInput(session, "yrange", min = numeric_min, max = numeric_max, 
+                          value = c(numeric_min, numeric_max))}})
 
     output$plot_ui <- renderUI({
         req(filtered_dt())
         
-        if (input$animated == "No") {plotOutput("plot_vis")} 
-        else {imageOutput("animated_plot")}})
+        if (input$animated == "No") {
+            plotOutput("plot_vis")} 
+        else {
+            imageOutput("animated_plot")}})
     
     output$static_plot <- renderPlot({
         req(filtered_dt(), input$animated == "No")
