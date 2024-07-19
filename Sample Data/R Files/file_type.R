@@ -2,7 +2,7 @@ dt <- reactive({
     req(input$file)
     file_ext = file_ext(input$file$datapath)
     
-    file_type <- switch(file_ext, 
+    switch(file_ext, 
            "csv" = read.csv(input$file$datapath), 
            "json" = fromJSON(input$file$datapath), 
            "xls" = read_xlsx(input$file$datapath, sheet = 1), 
