@@ -32,23 +32,16 @@ ui <- fluidPage(
 
 server <- function(input, output, session) {
     dt <- reactive({
-        req(input$file)
-        file_ext <- file_ext(input$file$datapath)
-        
-        if (file_ext == "csv") {
-            read.csv(input$file$datapath)}
-        
-        else if (file_ext == "json") {
-            fromJSON(input$file$datapath)}
-        
-        else if (file_ext %in% c("xls", "xlsx")) {
-            read_xlsx(input$file$datapath)}
-        
-        else if (file_ext == "ods") {
-            read_ods(input$file$datapath)}
-        
-        else {
-            stop("Unsupported file type. Please stick to the file requirements: CSV, JSON, XLS, XLSX, or ODS")}})
+    req(input$file)
+    file_ext = file_ext(input$file$datapath)
+    
+    switch(file_ext, 
+           "csv" = read.csv(input$file$datapath), 
+           "json" = fromJSON(input$file$datapath), 
+           "xls" = read_xlsx(input$file$datapath, sheet = 1), 
+           "xlsx" = read_xlsx(input$file$datapath, sheet = 1), 
+           "ods" = read_ods(input$file$datapath), 
+           stop("Incorrect file type. Please retry in the following format: CSV, JSON, XLSX, XLS, ODS."))})
     
     clean_dt <- reactive({
         req(dt())
