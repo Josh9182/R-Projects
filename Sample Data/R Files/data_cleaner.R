@@ -16,7 +16,7 @@ ui <- fluidPage(
             selectInput("white", "Trim white space?", choices = c("yes" = "Yes", "no" = "No")), 
             selectInput("null", "Remove NULL values?", choices = c("yes" = "Yes", "no" = "No")), 
             selectInput("cols", "Remove certain columns?", choices = c("yes" = "Yes", "no" = "No")),
-            selectInput("row_choice", "Remove certain rows?", choices = c("yes" = "Yes", "no" = "No"))), 
+            selectInput("rows", "Remove certain rows?", choices = c("yes" = "Yes", "no" = "No"))), 
         mainPanel(
             uiOutput("uio"),
             dataTableOutput("table"))))
