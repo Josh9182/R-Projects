@@ -18,6 +18,7 @@ ui <- fluidPage(
             checkboxGroupInput("cols", "Remove certain columns?", choices = NULL),
             selectInput("row_choice", "Remove certain rows?", choices = NULL)), 
         mainPanel(
+            uiOutput("ui"),
             dataTableOutput("table"))))
 
 server <- function(input, output, session) {
