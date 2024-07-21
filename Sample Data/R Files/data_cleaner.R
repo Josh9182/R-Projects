@@ -18,7 +18,7 @@ ui <- fluidPage(
             selectInput("cols", "Remove certain columns?", choices = c("yes" = "Yes", "no" = "No")),
             selectInput("row_choice", "Remove certain rows?", choices = c("yes" = "Yes", "no" = "No"))), 
         mainPanel(
-            uiOutput("ui"),
+            uiOutput("uio"),
             dataTableOutput("table"))))
 
 server <- function(input, output, session) {
