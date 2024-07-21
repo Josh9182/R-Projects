@@ -16,14 +16,11 @@ ui <- fluidPage(
             selectInput("white", "Trim white space?", choices = c("Yes", "No"), selected = "No"), 
             selectInput("null", "Remove NULL values?", choices = c("Yes", "No"), selected = "No"), 
             selectInput("cols", "Remove certain columns?", choices = c("Yes", "No"), selected = "No"),
-            selectInput("rows", "Remove certain rows?", choices = c("Yes", "No"), selected = "No")
-        ), 
+            selectInput("rows", "Remove certain rows?", choices = c("Yes", "No"), selected = "No")),
+        
         mainPanel(
             uiOutput("uio"),
-            dataTableOutput("table")
-        )
-    )
-)
+            dataTableOutput("table"))))
 
 server <- function(input, output, session) {
     data <- reactive({
@@ -40,8 +37,8 @@ server <- function(input, output, session) {
         
         print("Data loaded:")
         print(head(df))
-        df
-    })
+        
+        df})
     
     observe({
         req(data())
@@ -51,20 +48,16 @@ server <- function(input, output, session) {
             ui_cols <- list()
             ui_rows <- list()
             
-            if (input$cols == "yes") {
+            if (input$cols == "Yes") {
                 ui_cols <- c(ui_cols, 
-                             list(selectInput("col_choice", "Select Columns to Remove:", choices = colnames(df), multiple = TRUE)))
-            }
+                             list(selectInput("col_choice", "Select Columns to Remove:", choices = colnames(df), multiple = TRUE)))}
             
-            if (input$rows == "yes") {
+            if (input$rows == "Yes") {
                 ui_rows <- c(ui_rows, 
-                             list(sliderInput("row_choice", "Select Rows to Remove:", min = 1, max = nrow(df), value = c(1, nrow(df)))))
-            }
+                             list(sliderInput("row_choice", "Select Rows to Remove:", min = 1, max = floor(nrow(df)), value = c(1, floor(nrow(df))))))}
             
             ui_elements <- c(ui_cols, ui_rows)
-            do.call(tagList, ui_elements)
-        })
-    })
+            do.call(tagList, ui_elements)})})
     
     filtered_dt <- reactive({
         req(data())
@@ -77,41 +70,32 @@ server <- function(input, output, session) {
             dt <- dt %>%
                 select(-all_of(input$col_choice))
             print("After column removal:")
-            print(head(dt))
-        }
+            print(head(dt))}
         
         if (!is.null(input$row_choice)) {
             row_range <- input$row_choice
             dt <- dt[-seq(row_range[1], row_range[2]), ]
             print("After row removal:")
-            print(head(dt))
-        }
+            print(head(dt))}
         
-        if (input$white == "yes") {
+        if (input$white == "Yes") {
             dt <- dt %>%
                 mutate(across(where(is.character), ~ trimws(.)))
             print("After trimming white space:")
-            print(head(dt))
-        }
+            print(head(dt))}
         
-        if (input$null == "yes") {
+        if (input$null == "Yes") {
             dt <- dt %>%
                 na.omit()
             print("After removing NULL values:")
-            print(head(dt))
-        }
-        
-        dt
-    })
+            print(head(dt))}
+        dt})
     
     output$table <- renderDataTable({
         df <- filtered_dt()
         req(df)
-        if (nrow(df) == 0) {
-            return(NULL)
-        }
-        datatable(df)
-    })
-}
+        if (floor(nrow(df)) == 0) {
+            return(NULL)}
+        datatable(df)})}
 
 shinyApp(ui = ui, server = server)
