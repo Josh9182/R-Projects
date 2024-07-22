@@ -27,7 +27,7 @@ server <- function(input, output, session) {
         req(input$file)
         file_ext <- tools::file_ext(input$file$datapath)
         
-        df <- switch(file_ext, 
+        dt <- switch(file_ext, 
                      csv = read_csv(input$file$datapath),
                      json = fromJSON(input$file$datapath),
                      xml = read_xml(input$file$datapath),
@@ -36,13 +36,13 @@ server <- function(input, output, session) {
                      stop("Incorrect file type, please restart."))
         
         print("Data loaded:")
-        print(head(df))
+        print(head(dt))
         
-        df})
+        dt})
     
     observe({
         req(data())
-        df <- data()
+        dt <- data()
         
         output$uio <- renderUI({
             ui_cols <- list()
@@ -50,11 +50,11 @@ server <- function(input, output, session) {
             
             if (input$cols == "Yes") {
                 ui_cols <- c(ui_cols, 
-                             list(selectInput("col_choice", "Select Columns to Remove:", choices = colnames(df), multiple = TRUE)))}
+                             list(selectInput("col_choice", "Select Columns to Remove:", choices = colnames(dt), multiple = TRUE)))}
             
             if (input$rows == "Yes") {
                 ui_rows <- c(ui_rows, 
-                             list(sliderInput("row_choice", "Select Rows to Remove:", min = 1, max = floor(nrow(df)), value = c(1, floor(nrow(df))))))}
+                             list(sliderInput("row_choice", "Select Rows to Remove:", min = 1, max = floor(nrow(dt)), value = c(1, floor(nrow(dt))))))}
             
             ui_elements <- c(ui_cols, ui_rows)
             do.call(tagList, ui_elements)})})
@@ -92,10 +92,10 @@ server <- function(input, output, session) {
         dt})
     
     output$table <- renderDataTable({
-        df <- filtered_dt()
-        req(df)
-        if (floor(nrow(df)) == 0) {
+        dt <- filtered_dt()
+        req(dt)
+        if (floor(nrow(dt)) == 0) {
             return(NULL)}
-        datatable(df)})}
+        datatable(dt)})}
 
 shinyApp(ui = ui, server = server)
