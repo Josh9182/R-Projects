@@ -16,7 +16,8 @@ ui <- fluidPage(
             selectInput("white", "Trim white space?", choices = c("Yes", "No"), selected = "No"), 
             selectInput("null", "Remove NULL values?", choices = c("Yes", "No"), selected = "No"), 
             selectInput("cols", "Remove certain columns?", choices = c("Yes", "No"), selected = "No"),
-            selectInput("rows", "Remove certain rows?", choices = c("Yes", "No"), selected = "No")),
+            selectInput("rows", "Remove certain rows?", choices = c("Yes", "No"), selected = "No"), 
+            downloadButton("download", "Download File:")),
         
         mainPanel(
             uiOutput("uio"),
@@ -25,7 +26,7 @@ ui <- fluidPage(
 server <- function(input, output, session) {
     data <- reactive({
         req(input$file)
-        file_ext <- tools::file_ext(input$file$datapath)
+        file_ext <- file_ext(input$file$datapath)
         
         dt <- switch(file_ext, 
                      csv = read_csv(input$file$datapath),
@@ -58,6 +59,8 @@ server <- function(input, output, session) {
             
             ui_elements <- c(ui_cols, ui_rows)
             do.call(tagList, ui_elements)})})
+
+    observe({})
     
     filtered_dt <- reactive({
         req(data())
@@ -96,6 +99,24 @@ server <- function(input, output, session) {
         req(dt)
         if (floor(nrow(dt)) == 0) {
             return(NULL)}
-        datatable(dt)})}
+        datatable(dt)})
+    
+    output$download <- downloadHandler(
+        
+        filename = function() {
+            paste("cleaned_data", file_ext(input$file$name), sep =".")}, 
+        
+        content = function(file) {
+            dt <- filtered_dt()
+            req(dt())
+            file_ext <- file_ext(input$file$name)
+            
+            switch(file_ext, 
+                   csv = write_csv(dt, file),
+                   json = write_json(dt, file),
+                   xml = write_xml(dt, file),
+                   xls = write_xlsx(dt, file),
+                   ods = write_ods(dt, file), 
+                   stop("Incorrect file type, please restart."))})}
 
 shinyApp(ui = ui, server = server)
