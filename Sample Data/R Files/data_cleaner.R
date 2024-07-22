@@ -13,8 +13,10 @@ ui <- fluidPage(
     sidebarLayout(
         sidebarPanel(
             fileInput("file", "Import your CSV, JSON, XML, XLSX, or ODS file below:"), 
-            selectInput("white", "Trim white space?", choices = c("Yes", "No"), selected = "No"), 
-            selectInput("null", "Remove NULL values?", choices = c("Yes", "No"), selected = "No"), 
+            selectInput("white", "Trim white space?", choices = c("Yes", "No"), selected = "No"),
+            selectInput("dupl", "Remove duplicate values?", choices = c("Yes", "No"), selected = "No"),
+            selectInput("null", "Remove NULL values?", choices = c("Yes", "No"), selected = "No"),
+            selectInput("case", "Change text case?", choices = c("Yes", "No"), selected = "No"),
             selectInput("cols", "Remove certain columns?", choices = c("Yes", "No"), selected = "No"),
             selectInput("rows", "Remove certain rows?", choices = c("Yes", "No"), selected = "No"), 
             downloadButton("download", "Download File:")),
@@ -32,13 +34,9 @@ server <- function(input, output, session) {
                      csv = read_csv(input$file$datapath),
                      json = fromJSON(input$file$datapath),
                      xml = read_xml(input$file$datapath),
-                     xls = read_xlsx(input$file$datapath),
+                     xlsx = read_xlsx(input$file$datapath),
                      ods = read_ods(input$file$datapath), 
                      stop("Incorrect file type, please restart."))
-        
-        print("Data loaded:")
-        print(head(dt))
-        
         dt})
     
     observe({
@@ -48,6 +46,7 @@ server <- function(input, output, session) {
         output$uio <- renderUI({
             ui_cols <- list()
             ui_rows <- list()
+            ui_case <- list()
             
             if (input$cols == "Yes") {
                 ui_cols <- c(ui_cols, 
@@ -55,67 +54,70 @@ server <- function(input, output, session) {
             
             if (input$rows == "Yes") {
                 ui_rows <- c(ui_rows, 
-                             list(sliderInput("row_choice", "Select Rows to Remove:", min = 1, max = floor(nrow(dt)), value = c(1, floor(nrow(dt))))))}
+                             list(numericInput("row_choice", "Select Rows to Remove:", min = 0, max = nrow(dt), value = 0, step = 1)))}
+                             
+            if (input$case == "Yes") {
+                ui_case <- c(ui_case, 
+                             list(radioButtons("case_choice", "Select Case Change:", choices = c("Upper" = "Upper", "Lower" = "Lower"))))}
             
-            ui_elements <- c(ui_cols, ui_rows)
+            ui_elements <- c(ui_cols, ui_rows, ui_case)
             do.call(tagList, ui_elements)})})
-
-    observe({})
     
     filtered_dt <- reactive({
         req(data())
         dt <- data()
         
-        print("Initial data:")
-        print(head(dt))
-        
         if (!is.null(input$col_choice) && length(input$col_choice) > 0) {
             dt <- dt %>%
-                select(-all_of(input$col_choice))
-            print("After column removal:")
-            print(head(dt))}
+                select(-all_of(input$col_choice))}
         
-        if (!is.null(input$row_choice)) {
-            row_range <- input$row_choice
-            dt <- dt[-seq(row_range[1], row_range[2]), ]
-            print("After row removal:")
-            print(head(dt))}
+        if (!is.null(input$row_choice) && input$row_choice > 0) {
+            dt <- dt %>%
+                slice(-(1:input$row_choice))}
+        
+        if (!is.null(input$case_choice)) {
+            if (input$case_choice == "Upper") {
+                dt <- dt %>%
+                    mutate(across(where(is.character), ~ str_to_upper(.)))}
+                
+            else if (input$case_choice == "Lower") {
+                dt <- dt %>%
+                    mutate(across(where(is.character), ~ str_to_lower(.)))}}
         
         if (input$white == "Yes") {
             dt <- dt %>%
-                mutate(across(where(is.character), ~ trimws(.)))
-            print("After trimming white space:")
-            print(head(dt))}
+                mutate(across(where(is.character), ~ str_trim(.)))}
+
+        if (input$dupl == "Yes") {
+            dt <- dt %>%
+                distinct()}
         
         if (input$null == "Yes") {
             dt <- dt %>%
-                na.omit()
-            print("After removing NULL values:")
-            print(head(dt))}
-        dt})
+                drop_na()}
+            dt})
     
     output$table <- renderDataTable({
         dt <- filtered_dt()
         req(dt)
-        if (floor(nrow(dt)) == 0) {
+        if (nrow(dt) == 0) {
             return(NULL)}
         datatable(dt)})
     
     output$download <- downloadHandler(
-        
         filename = function() {
-            paste("cleaned_data", file_ext(input$file$name), sep =".")}, 
+            paste0("cleaned_data.", file_ext(input$file$name))},
         
         content = function(file) {
             dt <- filtered_dt()
-            req(dt())
+            req(dt)
             file_ext <- file_ext(input$file$name)
             
             switch(file_ext, 
                    csv = write_csv(dt, file),
                    json = write_json(dt, file),
                    xml = write_xml(dt, file),
-                   xls = write_xlsx(dt, file),
+                   xlsx = write_xlsx(dt, file),
                    ods = write_ods(dt, file), 
                    stop("Incorrect file type, please restart."))})}
 
