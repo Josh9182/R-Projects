@@ -27,16 +27,16 @@ server = function(input, output, session) {
     data <- reactive({
         req(input$file)
         
-            file_ext <- file_ext(input$file$datapath)
-            
-            dt <- switch(file_ext, 
-                         csv = read_csv(input$file$datapath), 
-                         json = fromJSON(input$file$datapath), 
-                         xml = read_xml(input$file$datapath), 
-                         xlsx = read_xlsx(input$file$datapath), 
-                         ods = read_ods(input$file$datapath), 
-                         stop("Unsupported file type, please retry."))
-            print(dt)})
+        file_ext <- file_ext(input$file$datapath)
+        
+        dt <- switch(file_ext, 
+                     csv = read_csv(input$file$datapath), 
+                     json = fromJSON(input$file$datapath), 
+                     xml = read_xml(input$file$datapath), 
+                     xlsx = read_xlsx(input$file$datapath), 
+                     ods = read_ods(input$file$datapath), 
+                     stop("Unsupported file type, please retry."))
+        print(dt)})
     
     
     output$file_sidebar <- renderUI({
@@ -53,6 +53,21 @@ server = function(input, output, session) {
                 uiOutput("tb_dyn"), 
                 
                 selectInput("plot_view", "View plot?", choices = c("Yes", "No"), selected = "No"),
-                uiOutput("pv_dyn"))}})}
+                uiOutput("pv_dyn"))}})
+    
+    output$cleaner_dyn <- renderUI({
+          
+            
+        if (input$cleaner == "Yes") {
+            tagList(
+                selectInput("white", "Trim white space?", choices = c("Yes", "No"), selected = "No"),
+                selectInput("dupl", "Remove duplicate values?", choices = c("Yes", "No"), selected = "No"),
+                selectInput("null", "Remove NULL values?", choices = c("Yes", "No"), selected = "No"),
+                selectInput("case", "Change text case?", choices = c("Yes", "No"), selected = "No"),
+                selectInput("cols", "Remove certain columns?", choices = c("Yes", "No"), selected = "No"),
+                selectInput("rows", "Remove certain rows?", choices = c("Yes", "No"), selected = "No"))}
+        else {
+            NULL}})  
+    }
 
 shinyApp(ui = ui, server = server)
