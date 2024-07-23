@@ -43,22 +43,15 @@ server = function(input, output, session) {
         
         if (!is.null(input$file)) {
             tagList(
-                selectInput("cleaner", "Clean the data?", choices = c("Yes", "No"), selected = "No"),
-                uiOutput("cleaner_dyn"),
-                
-                selectInput("visualizer", "Visualize the data?", choices = c("Yes", "No"), selected = "No"),
-                uiOutput("vis_dyn"), 
-                
-                selectInput("table_view", "View table?", choices = c("Yes", "No"), selected = "No"),
+                selectInput("table_view", "Table Customization:?", choices = c("Yes", "No"), selected = "No"),
                 uiOutput("tb_dyn"), 
                 
-                selectInput("plot_view", "View plot?", choices = c("Yes", "No"), selected = "No"),
+                selectInput("plot_view", "Plot Customization:?", choices = c("Yes", "No"), selected = "No"),
                 uiOutput("pv_dyn"))}})
     
-    output$cleaner_dyn <- renderUI({
+    output$tb_dyn <- renderUI({
           
-            
-        if (input$cleaner == "Yes") {
+        if (input$table_view == "Yes") {
             tagList(
                 selectInput("white", "Trim white space?", choices = c("Yes", "No"), selected = "No"),
                 selectInput("dupl", "Remove duplicate values?", choices = c("Yes", "No"), selected = "No"),
@@ -67,7 +60,18 @@ server = function(input, output, session) {
                 selectInput("cols", "Remove certain columns?", choices = c("Yes", "No"), selected = "No"),
                 selectInput("rows", "Remove certain rows?", choices = c("Yes", "No"), selected = "No"))}
         else {
-            NULL}})  
+            NULL}})
+    
+    output$pv_dyn <- renderUI({
+        
+        if (input$plot_view == "Yes") {
+            tagList(
+                radioButtons("plot_type", "Choose Visualization Type:", choices = c("Pie Plot", "Bar Plot", "Scatter Plot", "Histogram Plot", ))
+                
+            )
+        }
+    })
+        
     }
 
 shinyApp(ui = ui, server = server)
