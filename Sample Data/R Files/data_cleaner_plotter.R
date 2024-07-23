@@ -7,6 +7,7 @@ library(stringr)
 library(DT)
 library(tidyverse)
 library(shiny)
+library(ggplot2)
 
 ui <- fluidPage(
     titlePanel("Data Cleaner & Visualizer"), 
@@ -18,7 +19,7 @@ ui <- fluidPage(
             downloadButton("download", "Download file:")), 
         
         mainPanel(
-            uiOutput("uio"), 
+            uiOutput("uio"),
             dataTableOutput("table"), 
             plotOutput("plot"))))
 
@@ -37,7 +38,6 @@ server = function(input, output, session) {
                      stop("Unsupported file type, please retry."))
         print(fp)})
     
-    
     output$file_sidebar <- renderUI({
         req(input$file)
         
@@ -55,13 +55,44 @@ server = function(input, output, session) {
         if (input$table_view == "Yes") {
             tagList(
                 selectInput("white", "Trim white space?", choices = c("Yes", "No"), selected = "No"),
-                selectInput("dupl", "Remove duplicate values?", choices = c("Yes", "No"), selected = "No"),
-                selectInput("null", "Remove NULL values?", choices = c("Yes", "No"), selected = "No"),
+                selectInput("dupl", "Remove duplicate rows?", choices = c("Yes", "No"), selected = "No"),
+                selectInput("null", "Remove NULL rows?", choices = c("Yes", "No"), selected = "No"),
+                
                 selectInput("case", "Change text case?", choices = c("Yes", "No"), selected = "No"),
+                uiOutput("case_choice"),
+                
                 selectInput("cols", "Remove certain columns?", choices = c("Yes", "No"), selected = "No"),
-                selectInput("rows", "Remove certain rows?", choices = c("Yes", "No"), selected = "No"))}
+                uiOutput("col_choice"),
+                
+                selectInput("rows", "Remove certain rows?", choices = c("Yes", "No"), selected = "No"),
+                uiOutput("row_choice"))}
         else {
             NULL}})
+    
+    output$case_choice <- renderUI({
+        req(input$case)
+        
+        if (input$case == "Yes") {
+            tagList(
+                radioButtons("case_selector", "Case Type:", choices = c("Upper", "Lower")))}
+        else {
+            NULL}})
+    
+    output$col_choice <- renderUI({
+        req(input$cols)
+        
+        if (input$cols == "Yes") {
+            tagList(
+                selectInput("col_selector", "Columns to Remove:", choices = colnames(data()), multiple = TRUE))}
+        else {
+            NULL}})
+    
+    output$row_choice <- renderUI({
+        req(input$rows)
+        
+        if (input$rows == "Yes") {
+            tagList(
+                sliderInput("row_selector", "Rows to Remove:", min = 0, max = nrow(data()), value = 0, step = 1))}})
     
     output$pv_dyn <- renderUI({
         req(input$plot_view)
@@ -71,15 +102,62 @@ server = function(input, output, session) {
                 radioButtons("plot_type", "Choose Visualization Type:", choices = c("Pie", "Bar", "Scatter", "Jitter", "Histogram", "Lolipop")))}
         else {
             NULL}})
-
     
+    filtered_dt <- reactive({
+        req(data())
+        dt <- data()
+        
+        if (input$white == "Yes") {
+            dt <- dt %>%
+                mutate(across(where(is.character), ~ str_trim(.)))}
+        
+        if (input$dupl == "Yes") {
+            dt <- dt %>%
+                distinct()}
+        
+        if (input$null == "Yes") {
+            dt <- dt %>%
+                drop_na()}
+        
+        if (input$case == "Yes") {
+            if (input$case_selector == "Upper") {
+                dt <- dt %>%
+                    mutate(across(where(is.character), ~ str_to_upper(.)))}
+            else if (input$case_selector == "Lower") {
+                dt <- dt%>%
+                    mutate(across(where(is.character), ~ str_to_lower(.)))}}
+        
+        if (input$cols == "Yes") {
+            if (!is.null(input$col_selector)) {
+                dt <- dt %>%
+                    select(-all_of(input$col_selector))}}
+        
+        if (input$rows == "Yes") {
+            if (!is.null(input$row_selector)) {
+                dt <- dt %>%
+                    slice(-(1:input$row_selector))}}
+        
+        print(dt)})
+
     output$table <- renderDataTable({
         req(input$table_view == "Yes") 
-            dt <- data()
+            dt <- filtered_dt()
             req(dt)
             
             if (nrow(dt) == 0) {
                 return(NULL)}
-            datatable(dt)})}
+            datatable(dt)})
+    
+    plot_dt <- reactive({
+        req(filtered_dt)
+        dt <- filtered_dt
+        
+        if (input$plot_type == "Pie") {
+            ggplot(dt, aes(x = "", y = ))
+        } 
+    })
+    
+    }
+
 
 shinyApp(ui = ui, server = server)
