@@ -43,14 +43,14 @@ server = function(input, output, session) {
         
         if (!is.null(input$file)) {
             tagList(
-                selectInput("table_view", "Table Customization:?", choices = c("Yes", "No"), selected = "No"),
+                selectInput("table_view", "Table Customization:", choices = c("Yes", "No"), selected = "No"),
                 uiOutput("tb_dyn"), 
                 
-                selectInput("plot_view", "Plot Customization:?", choices = c("Yes", "No"), selected = "No"),
+                selectInput("plot_view", "Plot Customization:", choices = c("Yes", "No"), selected = "No"),
                 uiOutput("pv_dyn"))}})
     
     output$tb_dyn <- renderUI({
-          
+        
         if (input$table_view == "Yes") {
             tagList(
                 selectInput("white", "Trim white space?", choices = c("Yes", "No"), selected = "No"),
@@ -66,12 +66,10 @@ server = function(input, output, session) {
         
         if (input$plot_view == "Yes") {
             tagList(
-                radioButtons("plot_type", "Choose Visualization Type:", choices = c("Pie Plot", "Bar Plot", "Scatter Plot", "Histogram Plot", ))
-                
-            )
-        }
-    })
-        
-    }
+                radioButtons("plot_type", "Choose Visualization Type:", choices = c("Pie", "Bar", "Scatter", "Jitter", "Histogram", "Lolipop")))}
+        else {
+            NULL}})
+    
+}
 
 shinyApp(ui = ui, server = server)
