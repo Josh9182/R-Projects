@@ -23,23 +23,23 @@ ui <- fluidPage(
             plotOutput("plot"))))
 
 server = function(input, output, session) {
-    
     data <- reactive({
         req(input$file)
         
         file_ext <- file_ext(input$file$datapath)
         
-        dt <- switch(file_ext, 
+        fp <- switch(file_ext, 
                      csv = read_csv(input$file$datapath), 
                      json = fromJSON(input$file$datapath), 
                      xml = read_xml(input$file$datapath), 
                      xlsx = read_xlsx(input$file$datapath), 
                      ods = read_ods(input$file$datapath), 
                      stop("Unsupported file type, please retry."))
-        print(dt)})
+        print(fp)})
     
     
     output$file_sidebar <- renderUI({
+        req(input$file)
         
         if (!is.null(input$file)) {
             tagList(
@@ -50,6 +50,7 @@ server = function(input, output, session) {
                 uiOutput("pv_dyn"))}})
     
     output$tb_dyn <- renderUI({
+        req(input$table_view)
         
         if (input$table_view == "Yes") {
             tagList(
@@ -63,13 +64,22 @@ server = function(input, output, session) {
             NULL}})
     
     output$pv_dyn <- renderUI({
+        req(input$plot_view)
         
         if (input$plot_view == "Yes") {
             tagList(
                 radioButtons("plot_type", "Choose Visualization Type:", choices = c("Pie", "Bar", "Scatter", "Jitter", "Histogram", "Lolipop")))}
         else {
             NULL}})
+
     
-}
+    output$table <- renderDataTable({
+        req(input$table_view == "Yes") 
+            dt <- data()
+            req(dt)
+            
+            if (nrow(dt) == 0) {
+                return(NULL)}
+            datatable(dt)})}
 
 shinyApp(ui = ui, server = server)
