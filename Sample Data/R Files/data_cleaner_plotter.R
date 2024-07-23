@@ -1,3 +1,13 @@
+library(readODS)
+library(readxl)
+library(jsonlite)
+library(xml2)
+library(tools)
+library(stringr)
+library(DT)
+library(tidyverse)
+library(shiny)
+
 ui <- fluidPage(
     titlePanel("Data Cleaner & Visualizer"), 
     
