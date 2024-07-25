@@ -7,9 +7,11 @@ library(stringr)
 library(DT)
 library(tidyverse)
 library(shiny)
+library(shinyjs)
 library(ggplot2)
 
 ui <- fluidPage(
+    useShinyjs(),
     titlePanel("Data Cleaner & Visualizer"), 
     
     sidebarLayout(
@@ -65,7 +67,9 @@ server = function(input, output, session) {
                 uiOutput("col_choice"),
                 
                 selectInput("rows", "Remove certain rows?", choices = c("Yes", "No"), selected = "No"),
-                uiOutput("row_choice"))}
+                uiOutput("row_choice"), 
+                
+                checkboxInput("hide", "Hide Table (Saves Progress):", value = FALSE))}
         else {
             NULL}})
     
@@ -138,26 +142,40 @@ server = function(input, output, session) {
                     slice(-(1:input$row_selector))}}
         
         print(dt)})
-
+    
     output$table <- renderDataTable({
         req(input$table_view == "Yes") 
-            dt <- filtered_dt()
-            req(dt)
-            
-            if (nrow(dt) == 0) {
-                return(NULL)}
-            datatable(dt)})
-    
-    plot_dt <- reactive({
-        req(filtered_dt)
-        dt <- filtered_dt
+        dt <- filtered_dt()
+        req(dt)
         
-        if (input$plot_type == "Pie") {
-            ggplot(dt, aes(x = "", y = ))
-        } 
-    })
+        if (nrow(dt) == 0) {
+            return(NULL)}
+        datatable(dt)})
     
-    }
-
+    observeEvent(input$hide, {
+        if (input$hide) {
+            output$table <- renderDataTable({NULL})
+            hide("white")
+            hide("dupl")
+            hide("null")
+            hide("case")
+            hide("cols")
+            hide("rows")
+            hide("case_choice")
+            hide("col_choice")
+            hide("row_choice")}
+        else {
+            output$table <- renderDataTable({
+                dt <- filtered_dt()
+                show("white")
+                show("dupl")
+                show("null")
+                show("case")
+                show("cols")
+                show("rows")
+                show("case_choice")
+                show("col_choice")
+                show("row_choice")
+                datatable(dt)})}})}
 
 shinyApp(ui = ui, server = server)
