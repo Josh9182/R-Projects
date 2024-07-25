@@ -98,59 +98,59 @@ server = function(input, output, session) {
             tagList(
                 sliderInput("row_selector", "Rows to Remove:", min = 0, max = nrow(data()), value = 0, step = 1))}})
     
-    output$pv_dyn <- renderUI({
-        req(input$plot_view)
-        
-        if (input$plot_view == "Yes") {
-            tagList(
-                radioButtons("plot_type", "Choose Visualization Type:", choices = c("Pie", "Bar", "Scatter", "Jitter", "Histogram", "Lolipop")))}
-        else {
-            NULL}})
-    
     filtered_dt <- reactive({
         req(data())
-        dt <- data()
+        fdt <- data()
         
-        if (input$white == "Yes") {
-            dt <- dt %>%
-                mutate(across(where(is.character), ~ str_trim(.)))}
-        
-        if (input$dupl == "Yes") {
-            dt <- dt %>%
-                distinct()}
-        
-        if (input$null == "Yes") {
-            dt <- dt %>%
-                drop_na()}
-        
-        if (input$case == "Yes") {
-            if (input$case_selector == "Upper") {
-                dt <- dt %>%
-                    mutate(across(where(is.character), ~ str_to_upper(.)))}
-            else if (input$case_selector == "Lower") {
-                dt <- dt%>%
-                    mutate(across(where(is.character), ~ str_to_lower(.)))}}
-        
-        if (input$cols == "Yes") {
-            if (!is.null(input$col_selector)) {
-                dt <- dt %>%
-                    select(-all_of(input$col_selector))}}
-        
-        if (input$rows == "Yes") {
-            if (!is.null(input$row_selector)) {
-                dt <- dt %>%
-                    slice(-(1:input$row_selector))}}
-        
-        print(dt)})
+        if (!is.null(fdt) && nrow(fdt) > 0) {
+         
+            if (input$white == "Yes") {
+                fdt <- fdt %>%
+                    mutate(across(where(is.character), ~ str_trim(.)))}
+            
+            if (input$dupl == "Yes") {
+                fdt <- fdt %>%
+                    distinct()}
+            
+            if (input$null == "Yes") {
+                fdt <- fdt %>%
+                    drop_na()}
+            
+            if (input$case == "Yes") {
+                if (input$case_selector == "Upper") {
+                    fdt <- fdt %>%
+                        mutate(across(where(is.character), ~ str_to_upper(.)))}
+                else if (input$case_selector == "Lower") {
+                    fdt <- fdt %>%
+                        mutate(across(where(is.character), ~ str_to_lower(.)))}}
+            else {
+                NULL}
+            
+            if (input$cols == "Yes") {
+                if (!is.null(input$col_selector)) {
+                    fdt <- fdt %>%
+                        select(-all_of(input$col_selector))}}
+            else {
+                NULL}
+            
+            if (input$rows == "Yes") {
+                if (!is.null(input$row_selector)) {
+                    fdt <- fdt %>%
+                        slice(-(1:input$row_selector))}}
+            
+            print(fdt)}
+            
+        else {
+            data.frame()}})
     
     output$table <- renderDataTable({
         req(input$table_view == "Yes") 
-        dt <- filtered_dt()
-        req(dt)
+        fdt <- filtered_dt()
+        req(fdt)
         
-        if (nrow(dt) == 0) {
+        if (nrow(fdt) == 0) {
             return(NULL)}
-        datatable(dt)})
+        datatable(fdt)})
     
     observeEvent(input$hide, {
         if (input$hide) {
@@ -166,7 +166,7 @@ server = function(input, output, session) {
             hide("row_choice")}
         else {
             output$table <- renderDataTable({
-                dt <- filtered_dt()
+                fdt <- filtered_dt()
                 show("white")
                 show("dupl")
                 show("null")
@@ -176,6 +176,19 @@ server = function(input, output, session) {
                 show("case_choice")
                 show("col_choice")
                 show("row_choice")
-                datatable(dt)})}})}
+                datatable(fdt)})}})
+    
+    output$pv_dyn <- renderUI({
+        req(input$plot_view)
+        req(filtered_dt)
+        fdt <- filtered_dt()
+        
+        if (input$plot_view == "Yes") {
+            tagList(
+                selectInput("x_value", "X Value:", choices = colnames(fdt), multiple = TRUE),
+                selectInput("y_value", "Y Value:", choices = colnames(fdt)),
+                radioButtons("plot_type", "Choose Visualization Type:", choices = c("Pie", "Bar", "Scatter", "Jitter", "Histogram", "Lolipop")))}
+        else {
+            NULL}})}
 
 shinyApp(ui = ui, server = server)
