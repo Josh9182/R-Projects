@@ -103,7 +103,7 @@ server = function(input, output, session) {
         fdt <- data()
         
         if (!is.null(fdt) && nrow(fdt) > 0) {
-         
+            
             if (input$white == "Yes") {
                 fdt <- fdt %>%
                     mutate(across(where(is.character), ~ str_trim(.)))}
@@ -139,7 +139,7 @@ server = function(input, output, session) {
                         slice(-(1:input$row_selector))}}
             
             print(fdt)}
-            
+        
         else {
             data.frame()}})
     
@@ -181,14 +181,27 @@ server = function(input, output, session) {
     output$pv_dyn <- renderUI({
         req(input$plot_view)
         req(filtered_dt)
-        fdt <- filtered_dt()
+        fdt <- filtered_dt
         
         if (input$plot_view == "Yes") {
             tagList(
                 selectInput("x_value", "X Value:", choices = colnames(fdt), multiple = TRUE),
                 selectInput("y_value", "Y Value:", choices = colnames(fdt)),
+                
                 radioButtons("plot_type", "Choose Visualization Type:", choices = c("Pie", "Bar", "Scatter", "Jitter", "Histogram", "Lolipop")))}
         else {
-            NULL}})}
+            NULL}})
+    
+    plot_vis <- reactive({
+        req(filtered_dt)
+        
+        fdt <- filtered_dt
+        
+        if (nrow(fdt) > 0 && !is.null(input$x_value) && !is.null(input$y_value)) {
+            if () {}
+        }
+    })
+    
+    }
 
 shinyApp(ui = ui, server = server)
