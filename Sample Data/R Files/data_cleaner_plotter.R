@@ -196,34 +196,7 @@ server = function(input, output, session) {
             hide("x_value")}
         else {
             show("x_value")}})
-    
-    plot_vis <- reactive({
-        req(input$plot_view == "Yes")
-        req(filtered_dt)
-        fdt <- filtered_dt()
         
-        if (input$plot_type == "Pie") {
-            
-            fdt <- fdt %>%
-                count(input$y_value) %>%
-                mutate(percentage = n / sum(n) * 100)
-            
-            ggplot(fdt, aes(x = "", y = n, fill = input$y_value)) +
-                geom_bar(stat = "identity", linewidth = 2, color = "white") +
-                coord_polar(theta = "y") +
-                labs(title = paste("Pie Chart of the Count of", input$y_value), fill = paste("Type of", input$y_value)) +
-                geom_text(aes(label = paste0(round(percentage, 1), "%")), 
-                          position = position_stack(vjust = .5), size = 9, color = "white") + 
-                
-                theme_void() +
-                theme(plot.title = element_text(size = 25, hjust = .5),
-                      legend.text = element_text(size = 15),
-                      legend.title = element_text(size = 18))}})
-    
-    output$plot <- renderPlot({
-        req(input$table_view == "Yes")
-        
-    })
     
 }
 
