@@ -104,19 +104,19 @@ server = function(input, output, session) {
         
         if (!is.null(fdt) && nrow(fdt) > 0) {
             
-            if (input$white == "Yes") {
+            if (!is.null(input$white) && input$white == "Yes") {
                 fdt <- fdt %>%
                     mutate(across(where(is.character), ~ str_trim(.)))}
             
-            if (input$dupl == "Yes") {
+            if (!is.null(input$dupl) && input$dupl == "Yes") {
                 fdt <- fdt %>%
                     distinct()}
             
-            if (input$null == "Yes") {
+            if (!is.null(input$null) && input$null == "Yes") {
                 fdt <- fdt %>%
                     drop_na()}
             
-            if (input$case == "Yes") {
+            if (!is.null(input$case) && input$case == "Yes") {
                 if (input$case_selector == "Upper") {
                     fdt <- fdt %>%
                         mutate(across(where(is.character), ~ str_to_upper(.)))}
@@ -126,14 +126,14 @@ server = function(input, output, session) {
             else {
                 NULL}
             
-            if (input$cols == "Yes") {
+            if (!is.null(input$cols) && input$cols == "Yes") {
                 if (!is.null(input$col_selector)) {
                     fdt <- fdt %>%
                         select(-all_of(input$col_selector))}}
             else {
                 NULL}
             
-            if (input$rows == "Yes") {
+            if (!is.null(input$rows) && input$rows == "Yes") {
                 if (!is.null(input$row_selector)) {
                     fdt <- fdt %>%
                         slice(-(1:input$row_selector))}}
@@ -196,7 +196,22 @@ server = function(input, output, session) {
             hide("x_value")}
         else {
             show("x_value")}})
+    
+    output$plot <- renderPlot({
+        req(input$plot_view)
+        req(input$plot_type)
+        req(filtered_dt)
+        fdt <- filtered_dt()
+        req(fdt)
         
+        if (input$plot_view == "Yes") {
+            if (input$plot_type == "Pie") {
+                ggplot(fdt, aes(x = "", y = !!sym(input$y_value), fill = !!sym(input$y_value))) +
+                    geom_bar(stat = "identity") +
+                    coord_polar(theta = "y")}}
+        else {
+            NULL}})
+    
     
 }
 
