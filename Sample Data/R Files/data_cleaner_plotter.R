@@ -11,7 +11,7 @@ library(shinyjs)
 library(ggplot2)
 
 ui <- fluidPage(
-    useShinyjs(),
+    useShinyjs(),  # Make sure shinyjs is used
     titlePanel("Data Cleaner & Visualizer"),
     
     sidebarLayout(
@@ -299,27 +299,67 @@ server = function(input, output, session) {
                           legend.title = element_text(size = 18))}
             
             else if (input$plot_type == "Lolipop") {
-                fdt <- fdt %>%
-                    group_by(!!sym(input$x_value)) %>%
-                    count(!!sym(input$y_value)) 
-                
-                ggplot(fdt, aes(x = !!sym(input$x_value), y = n)) +
-                    geom_segment(aes(xend = !!sym(input$x_value), yend = n, y = 0), color = "black", linewidth = 2) +
-                    geom_point(color = "black", size = 12) +
-                    geom_point(color = "lightblue", size = 10) +
-                    coord_flip() +
-                    labs(x = input$x_value, y = input$y_value) +
+                if (is.character(fdt[[input$x_value]]) || is.factor(fdt[[input$x_value]])) {
+                    fdt <- fdt %>%
+                        group_by(!!sym(input$x_value)) %>%
+                        count(!!sym(input$y_value)) 
                     
-                    theme_minimal() + 
-                    theme(panel.grid = element_line(linewidth = .5, color = "black"),
-                          axis.text.x = element_text(size = 15, hjust = 1, angle = 45, face = "bold", color = "black", margin = margin(t = 10)), 
-                          axis.text.y = element_text(size = 18, face = "bold", color = "black", margin = margin(l = 10)),
-                          plot.title = element_text(size = 25),
-                          axis.title = element_text(size = 20),
-                          legend.text = element_text(size = 15),
-                          legend.title = element_text(size = 18))}
-            }
-        })
+                    ggplot(fdt, aes(x = !!sym(input$x_value), y = n)) +
+                        geom_segment(aes(xend = !!sym(input$x_value), yend = n, y = 0), color = "black", linewidth = 2) +
+                        geom_point(color = "black", size = 12) +
+                        geom_point(color = "lightblue", size = 10) +
+                        coord_flip() +
+                        labs(x = input$x_value, y = input$y_value) +
+                        
+                        theme_minimal() + 
+                        theme(panel.grid = element_line(linewidth = .5, color = "black"),
+                              axis.text.x = element_text(size = 15, hjust = 1, angle = 45, face = "bold", color = "black", margin = margin(t = 10)), 
+                              axis.text.y = element_text(size = 18, face = "bold", color = "black", margin = margin(l = 10)),
+                              plot.title = element_text(size = 25),
+                              axis.title = element_text(size = 20),
+                              legend.text = element_text(size = 15),
+                              legend.title = element_text(size = 18))}
+                else {
+                    ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value))) +
+                        geom_segment(aes(xend = !!sym(input$x_value), yend = !!sym(input$y_value, y = 0), color = "black", linewidth = 2)) +
+                        geom_point(color = "black", size = 12) +
+                        geom_point(color = "lightblue", size = 10) +
+                        coord_flip() +
+                        labs(x = input$x_value, y = input$y_value) +
+                        
+                        theme_minimal() + 
+                        theme(panel.grid = element_line(linewidth = .5, color = "black"),
+                              axis.text.x = element_text(size = 15, hjust = 1, angle = 45, face = "bold", color = "black", margin = margin(t = 10)), 
+                              axis.text.y = element_text(size = 18, face = "bold", color = "black", margin = margin(l = 10)),
+                              plot.title = element_text(size = 25),
+                              axis.title = element_text(size = 20),
+                              legend.text = element_text(size = 15),
+                              legend.title = element_text(size = 18))}}}})
+    
+    output$download <- downloadHandler({
+        filename = function () {
+            paste0("cleaned_data.", file_ext(input$file$name))},
+        
+        content = function (file) {
+            fdt <- filtered_dt()
+            req(fdt)
+            
+            file_ext <- file_ext(input$file$name)
+            
+            switch(file_ext, 
+                   csv = write.csv(fdt, file),
+                   json = write_json(dt, file),
+                   xml = write_xml(dt, file),
+                   xlsx = write_xlsx(dt, file),
+                   ods = write_ods(dt, file), 
+                   stop("Incorrect file type, please restart."))}})
+    
+    output$download <- downloadHandler({
+        filename = function () {
+            paste0("plot.", )
+        }
+    })
+    
     }
 
 shinyApp(ui = ui, server = server)
