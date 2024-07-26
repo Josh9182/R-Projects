@@ -206,11 +206,30 @@ server = function(input, output, session) {
         
         if (input$plot_view == "Yes") {
             if (input$plot_type == "Pie") {
-                ggplot(fdt, aes(x = "", y = !!sym(input$y_value), fill = !!sym(input$y_value))) +
+                
+                fdt <- fdt %>%
+                    count(!!sym(input$y_value)) %>%
+                    mutate(percentage = n / sum(n) * 100)
+                
+                ggplot(fdt, aes(x = "", y = n, fill = !!sym(input$y_value))) +
                     geom_bar(stat = "identity") +
-                    coord_polar(theta = "y")}}
-        else {
-            NULL}})
+                    coord_polar(theta = "y") +
+                    labs(title = paste("Pie Chart of", input$y_value, "Elements"), fill = input$y_value) +
+                    geom_text(aes(label = paste0(round(percentage, 1), "%")),
+                              position = position_stack(vjust = .5), size = 5, color = "white") +
+                    
+                    theme_void() +
+                    theme(plot.title = element_text(size = 25),
+                          legend.text = element_text(size = 15),
+                          legend.title = element_text(size = 18))}}
+        
+            else if (input$plot_type == "Bar") {
+                ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$x_value), fill = !!sym(input$x_value))) +
+                    geom_bar(stat = "identity", position = "dodge") +
+                    coord_flip() +
+                    labs(title = paste("Bar Chart of", input$x_value, "Over", input$y_value), )
+            }
+        })
     
     
 }
