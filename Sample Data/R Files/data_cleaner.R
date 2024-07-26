@@ -7,119 +7,342 @@ library(stringr)
 library(DT)
 library(tidyverse)
 library(shiny)
+library(shinyjs)
+library(ggplot2)
 
 ui <- fluidPage(
-    titlePanel("Data Cleaner"),
+    useShinyjs(),  # Make sure shinyjs is used
+    titlePanel("Data Cleaner & Visualizer"),
     
     sidebarLayout(
         sidebarPanel(
-            fileInput("file", "Import your CSV, JSON, XML, XLSX, or ODS file below:"), 
-            selectInput("white", "Trim white space?", choices = c("Yes", "No"), selected = "No"),
-            selectInput("dupl", "Remove duplicate values?", choices = c("Yes", "No"), selected = "No"),
-            selectInput("null", "Remove NULL values?", choices = c("Yes", "No"), selected = "No"),
-            selectInput("case", "Change text case?", choices = c("Yes", "No"), selected = "No"),
-            selectInput("cols", "Remove certain columns?", choices = c("Yes", "No"), selected = "No"),
-            selectInput("rows", "Remove certain rows?", choices = c("Yes", "No"), selected = "No"), 
-            downloadButton("download", "Download File:")),
+            fileInput("file", "Import your file (CSV, JSON, XML, XLSX, ODS):"),
+            uiOutput("file_sidebar"),
+            downloadButton("download", "Download file:")
+        ),
         
         mainPanel(
             uiOutput("uio"),
-            dataTableOutput("table"))))
+            dataTableOutput("table"),
+            plotOutput("plot", height = 800, width = 1000))))
 
-server <- function(input, output, session) {
+server = function(input, output, session) {
     data <- reactive({
         req(input$file)
+        
         file_ext <- file_ext(input$file$datapath)
         
-        dt <- switch(file_ext, 
-                     csv = read_csv(input$file$datapath),
-                     json = fromJSON(input$file$datapath),
-                     xml = read_xml(input$file$datapath),
-                     xlsx = read_xlsx(input$file$datapath),
+        fp <- switch(file_ext, 
+                     csv = read_csv(input$file$datapath), 
+                     json = fromJSON(input$file$datapath), 
+                     xml = read_xml(input$file$datapath), 
+                     xlsx = read_xlsx(input$file$datapath), 
                      ods = read_ods(input$file$datapath), 
-                     stop("Incorrect file type, please restart."))
-        dt})
+                     stop("Unsupported file type, please retry."))
+        print(fp)})
     
-    observe({
-        req(data())
-        dt <- data()
+    output$file_sidebar <- renderUI({
+        req(input$file)
         
-        output$uio <- renderUI({
-            ui_cols <- list()
-            ui_rows <- list()
-            ui_case <- list()
-            
-            if (input$cols == "Yes") {
-                ui_cols <- c(ui_cols, 
-                             list(selectInput("col_choice", "Select Columns to Remove:", choices = colnames(dt), multiple = TRUE)))}
-            
-            if (input$rows == "Yes") {
-                ui_rows <- c(ui_rows, 
-                             list(numericInput("row_choice", "Select Rows to Remove:", min = 0, max = nrow(dt), value = 0, step = 1)))}
-                             
-            if (input$case == "Yes") {
-                ui_case <- c(ui_case, 
-                             list(radioButtons("case_choice", "Select Case Change:", choices = c("Upper" = "Upper", "Lower" = "Lower"))))}
-            
-            ui_elements <- c(ui_cols, ui_rows, ui_case)
-            do.call(tagList, ui_elements)})})
+        if (!is.null(input$file)) {
+            tagList(
+                selectInput("table_view", "Table Customization:", choices = c("Yes", "No"), selected = "No"),
+                uiOutput("tb_dyn"), 
+                
+                selectInput("plot_view", "Plot Customization:", choices = c("Yes", "No"), selected = "No"),
+                uiOutput("pv_dyn"))}})
+    
+    output$tb_dyn <- renderUI({
+        req(input$table_view)
+        
+        if (input$table_view == "Yes") {
+            tagList(
+                selectInput("white", "Trim white space?", choices = c("Yes", "No"), selected = "No"),
+                selectInput("dupl", "Remove duplicate rows?", choices = c("Yes", "No"), selected = "No"),
+                selectInput("null", "Remove NULL rows?", choices = c("Yes", "No"), selected = "No"),
+                
+                selectInput("case", "Change text case?", choices = c("Yes", "No"), selected = "No"),
+                uiOutput("case_choice"),
+                
+                selectInput("cols", "Remove certain columns?", choices = c("Yes", "No"), selected = "No"),
+                uiOutput("col_choice"),
+                
+                selectInput("rows", "Remove certain rows?", choices = c("Yes", "No"), selected = "No"),
+                uiOutput("row_choice"), 
+                
+                checkboxInput("hide", "Hide Table (Saves Progress):", value = FALSE))}
+        else {
+            NULL}})
+    
+    output$case_choice <- renderUI({
+        req(input$case)
+        
+        if (input$case == "Yes") {
+            tagList(
+                radioButtons("case_selector", "Case Type:", choices = c("Upper", "Lower")))}
+        else {
+            NULL}})
+    
+    output$col_choice <- renderUI({
+        req(input$cols)
+        
+        if (input$cols == "Yes") {
+            tagList(
+                selectInput("col_selector", "Columns to Remove:", choices = colnames(data()), multiple = TRUE))}
+        else {
+            NULL}})
+    
+    output$row_choice <- renderUI({
+        req(input$rows)
+        
+        if (input$rows == "Yes") {
+            tagList(
+                sliderInput("row_selector", "Rows to Remove:", min = 0, max = nrow(data()), value = 0, step = 1))}})
     
     filtered_dt <- reactive({
-        req(data())
-        dt <- data()
+        req(data)
+        fdt <- data()
         
-        if (!is.null(input$col_choice) && length(input$col_choice) > 0) {
-            dt <- dt %>%
-                select(-all_of(input$col_choice))}
+        if (!is.null(fdt) && nrow(fdt) > 0) {
+            
+            if (!is.null(input$white) && input$white == "Yes") {
+                fdt <- fdt %>%
+                    mutate(across(where(is.character), ~ str_trim(.)))}
+            
+            if (!is.null(input$dupl) && input$dupl == "Yes") {
+                fdt <- fdt %>%
+                    distinct()}
+            
+            if (!is.null(input$null) && input$null == "Yes") {
+                fdt <- fdt %>%
+                    drop_na()}
+            
+            if (!is.null(input$case) && input$case == "Yes") {
+                if (input$case_selector == "Upper") {
+                    fdt <- fdt %>%
+                        mutate(across(where(is.character), ~ str_to_upper(.)))}
+                else if (input$case_selector == "Lower") {
+                    fdt <- fdt %>%
+                        mutate(across(where(is.character), ~ str_to_lower(.)))}}
+            else {
+                NULL}
+            
+            if (!is.null(input$cols) && input$cols == "Yes") {
+                if (!is.null(input$col_selector)) {
+                    fdt <- fdt %>%
+                        select(-all_of(input$col_selector))}}
+            else {
+                NULL}
+            
+            if (!is.null(input$rows) && input$rows == "Yes") {
+                if (!is.null(input$row_selector)) {
+                    fdt <- fdt %>%
+                        slice(-(1:input$row_selector))}}
+            
+            data.frame(fdt)}
         
-        if (!is.null(input$row_choice) && input$row_choice > 0) {
-            dt <- dt %>%
-                slice(-(1:input$row_choice))}
-        
-        if (!is.null(input$case_choice)) {
-            if (input$case_choice == "Upper") {
-                dt <- dt %>%
-                    mutate(across(where(is.character), ~ str_to_upper(.)))}
-                
-            else if (input$case_choice == "Lower") {
-                dt <- dt %>%
-                    mutate(across(where(is.character), ~ str_to_lower(.)))}}
-        
-        if (input$white == "Yes") {
-            dt <- dt %>%
-                mutate(across(where(is.character), ~ str_trim(.)))}
-
-        if (input$dupl == "Yes") {
-            dt <- dt %>%
-                distinct()}
-        
-        if (input$null == "Yes") {
-            dt <- dt %>%
-                drop_na()}
-            dt})
+        else {
+            data.frame()}})
     
     output$table <- renderDataTable({
-        dt <- filtered_dt()
-        req(dt)
-        if (nrow(dt) == 0) {
+        req(input$table_view == "Yes") 
+        fdt <- filtered_dt()
+        req(fdt)
+        
+        if (nrow(fdt) == 0) {
             return(NULL)}
-        datatable(dt)})
+        datatable(fdt)})
     
-    output$download <- downloadHandler(
-        filename = function() {
+    observeEvent(input$hide, {
+        if (input$hide) {
+            output$table <- renderDataTable({NULL})
+            hide("white")
+            hide("dupl")
+            hide("null")
+            hide("case")
+            hide("cols")
+            hide("rows")
+            hide("case_choice")
+            hide("col_choice")
+            hide("row_choice")}
+        else {
+            output$table <- renderDataTable({
+                fdt <- filtered_dt()
+                show("white")
+                show("dupl")
+                show("null")
+                show("case")
+                show("cols")
+                show("rows")
+                show("case_choice")
+                show("col_choice")
+                show("row_choice")
+                datatable(fdt)})}})
+    
+    output$pv_dyn <- renderUI({
+        req(input$plot_view)
+        req(filtered_dt)
+        fdt <- filtered_dt()
+        
+        if (input$plot_view == "Yes") {
+            tagList(
+                selectInput("x_value", "X Value:", choices = colnames(fdt)),
+                selectInput("y_value", "Y Value:", choices = colnames(fdt)),
+                radioButtons("plot_type", "Choose Visualization Type:", choices = c("Pie", "Bar", "Scatter", "Jitter", "Histogram", "Lolipop")))}
+        else {
+            NULL}})
+    
+    observeEvent(input$plot_type, {
+        if (input$plot_type == "Pie") {
+            hide("x_value")}
+        else {
+            show("x_value")}})
+    
+    output$plot <- renderPlot({
+        req(input$plot_view)
+        req(input$plot_type)
+        req(filtered_dt)
+        fdt <- filtered_dt()
+        req(fdt)
+        
+        if (input$plot_view == "Yes") {
+            
+            if (input$plot_type == "Pie") {
+                fdt <- fdt %>%
+                    count(!!sym(input$y_value)) %>%
+                    mutate(percentage = n / sum(n) * 100)
+                
+                ggplot(fdt, aes(x = "", y = n, fill = !!sym(input$y_value))) +
+                    geom_bar(stat = "identity") +
+                    coord_polar(theta = "y") +
+                    labs(title = paste("Pie Chart of", input$y_value, "Elements"), fill = input$y_value) +
+                    geom_text(aes(label = paste0(round(percentage, 1), "%")),
+                              position = position_stack(vjust = .5), size = 7, color = "white") +
+                    
+                    theme_void() +
+                    theme(plot.title = element_text(size = 25),
+                          legend.text = element_text(size = 15),
+                          legend.title = element_text(size = 18))
+                
+            } else if (input$plot_type == "Bar") {
+                fdt <- fdt %>%
+                    group_by(!!sym(input$x_value)) %>%
+                    count(!!sym(input$y_value)) 
+                
+                
+                ggplot(fdt, aes(x = !!sym(input$x_value), y = n, fill = !!sym(input$y_value))) +
+                    geom_bar(stat = "identity", position = "dodge", linewidth = 1, color = "black") +
+                    labs(title = paste("Bar Chart of", input$x_value, "Over", input$y_value), x = input$x_value, y = input$y_value, fill = input$y_value) +
+                    coord_flip() +
+                    
+                    theme_minimal() +
+                    theme(panel.grid = element_line(linewidth = .5, color = "black"),
+                          axis.text.x = element_text(size = 15, hjust = 1, angle = 45, face = "bold", color = "black", margin = margin(t = 10)), 
+                          axis.text.y = element_text(size = 18, face = "bold", color = "black", margin = margin(l = 10)),
+                          plot.title = element_text(size = 25),
+                          axis.title = element_text(size = 20),
+                          legend.text = element_text(size = 15),
+                          legend.title = element_text(size = 18))
+                
+            } else if (input$plot_type == "Scatter") {
+                fdt <- fdt %>%
+                    group_by(!!sym(input$x_value)) %>%
+                    count(!!sym(input$y_value)) 
+                
+                ggplot(fdt, aes(x = !!sym(input$x_value), y = n, color = !!sym(input$y_value))) +
+                    geom_point(size = 6, alpha = .8) +
+                    labs(title = paste("Scatter Plot of", input$x_value, "Over", input$y_value), x = input$x_value, y = input$y_value, color = input$x_value) +
+                    
+                    theme_minimal() +
+                    theme(panel.grid = element_line(linewidth = .5, color = "black"),
+                          axis.text.x = element_text(size = 15, hjust = 1, angle = 45, face = "bold", color = "black", margin = margin(t = 10)), 
+                          axis.text.y = element_text(size = 18, face = "bold", color = "black", margin = margin(l = 10)),
+                          plot.title = element_text(size = 25),
+                          axis.title = element_text(size = 20),
+                          legend.text = element_text(size = 15),
+                          legend.title = element_text(size = 18))}
+            
+            else if (input$plot_type == "Jitter") {
+                fdt <- fdt %>%
+                    group_by(!!sym(input$x_value)) %>%
+                    count(!!sym(input$y_value)) 
+                
+                ggplot(fdt, aes(x = !!sym(input$x_value), y = n, color = !!sym(input$y_value))) +
+                    geom_jitter(size = 6, width = 0.2, height = 0.2, alpha = .6) +
+                    labs(title = paste("Jitter Plot of", input$x_value, "Over", input$y_value), x = input$x_value, y = input$y_value, color = input$x_value) +
+                    
+                    theme_minimal() +
+                    theme(panel.grid = element_line(linewidth = .5, color = "black"),
+                          axis.text.x = element_text(size = 15, hjust = 1, angle = 45, face = "bold", color = "black", margin = margin(t = 10)), 
+                          axis.text.y = element_text(size = 18, face = "bold", color = "black", margin = margin(l = 10)),
+                          plot.title = element_text(size = 25),
+                          axis.title = element_text(size = 20),
+                          legend.text = element_text(size = 15),
+                          legend.title = element_text(size = 18))}
+            
+            else if (input$plot_type == "Histogram") {
+                fdt <- fdt %>%
+                    group_by(!!sym(input$x_value)) %>%
+                    count(!!sym(input$y_value)) 
+                
+                ggplot(fdt, aes(x = !!sym(input$x_value), y = n, color = !!sym(input$y_value))) +
+                    geom_histogram(stat = "identity", position = "stack", binwidth = .5, fill = "lightblue", linewidth = 1.5) +
+                    labs(x = input$x_value, y = "Count", fill = input$y_value) +
+                    
+                    theme_minimal() + 
+                    theme(panel.grid = element_line(linewidth = .5, color = "black"),
+                          axis.text.x = element_text(size = 15, hjust = 1, angle = 45, face = "bold", color = "black", margin = margin(t = 10)), 
+                          axis.text.y = element_text(size = 18, face = "bold", color = "black", margin = margin(l = 10)),
+                          plot.title = element_text(size = 25),
+                          axis.title = element_text(size = 20),
+                          legend.text = element_text(size = 15),
+                          legend.title = element_text(size = 18))}
+            
+            else if (input$plot_type == "Lolipop") {
+                fdt <- fdt %>%
+                    group_by(!!sym(input$x_value)) %>%
+                    count(!!sym(input$y_value)) 
+                
+                ggplot(fdt, aes(x = !!sym(input$x_value), y = n)) +
+                    geom_segment(aes(xend = !!sym(input$x_value), yend = n, y = 0), color = "black", linewidth = 2) +
+                    geom_point(color = "black", size = 12) +
+                    geom_point(color = "lightblue", size = 10) +
+                    coord_flip() +
+                    labs(x = input$x_value, y = input$y_value) +
+                    
+                    theme_minimal() + 
+                    theme(panel.grid = element_line(linewidth = .5, color = "black"),
+                          axis.text.x = element_text(size = 15, hjust = 1, angle = 45, face = "bold", color = "black", margin = margin(t = 10)), 
+                          axis.text.y = element_text(size = 18, face = "bold", color = "black", margin = margin(l = 10)),
+                          plot.title = element_text(size = 25),
+                          axis.title = element_text(size = 20),
+                          legend.text = element_text(size = 15),
+                          legend.title = element_text(size = 18))}}})
+    
+    output$download <- downloadHandler({
+        filename = function () {
             paste0("cleaned_data.", file_ext(input$file$name))},
         
-        content = function(file) {
-            dt <- filtered_dt()
-            req(dt)
+        content = function (file) {
+            fdt <- filtered_dt()
+            req(fdt)
+            
             file_ext <- file_ext(input$file$name)
             
             switch(file_ext, 
-                   csv = write_csv(dt, file),
+                   csv = write.csv(fdt, file),
                    json = write_json(dt, file),
                    xml = write_xml(dt, file),
                    xlsx = write_xlsx(dt, file),
                    ods = write_ods(dt, file), 
-                   stop("Incorrect file type, please restart."))})}
+                   stop("Incorrect file type, please restart."))}})
+    
+    output$download <- downloadHandler({
+        filename = function () {
+            paste0("plot.", )
+        }
+    })
+    
+    }
 
 shinyApp(ui = ui, server = server)
