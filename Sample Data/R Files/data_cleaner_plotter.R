@@ -11,7 +11,7 @@ library(shinyjs)
 library(ggplot2)
 
 ui <- fluidPage(
-    useShinyjs(),  # Make sure shinyjs is used
+    useShinyjs(), 
     titlePanel("Data Cleaner & Visualizer"),
     
     sidebarLayout(
@@ -263,40 +263,68 @@ server = function(input, output, session) {
                           legend.title = element_text(size = 18))}
             
             else if (input$plot_type == "Jitter") {
-                fdt <- fdt %>%
-                    group_by(!!sym(input$x_value)) %>%
-                    count(!!sym(input$y_value)) 
-                
-                ggplot(fdt, aes(x = !!sym(input$x_value), y = n, color = !!sym(input$y_value))) +
-                    geom_jitter(size = 6, width = 0.2, height = 0.2, alpha = .6) +
-                    labs(title = paste("Jitter Plot of", input$x_value, "Over", input$y_value), x = input$x_value, y = input$y_value, color = input$x_value) +
+                if (is.character(fdt[[input$x_value]]) || is.factor(fdt[[input$x_value]])) {
+                    fdt <- fdt %>%
+                        group_by(!!sym(input$x_value)) %>%
+                        count(!!sym(input$y_value)) 
                     
-                    theme_minimal() +
-                    theme(panel.grid = element_line(linewidth = .5, color = "black"),
-                          axis.text.x = element_text(size = 15, hjust = 1, angle = 45, face = "bold", color = "black", margin = margin(t = 10)), 
-                          axis.text.y = element_text(size = 18, face = "bold", color = "black", margin = margin(l = 10)),
-                          plot.title = element_text(size = 25),
-                          axis.title = element_text(size = 20),
-                          legend.text = element_text(size = 15),
-                          legend.title = element_text(size = 18))}
+                    ggplot(fdt, aes(x = !!sym(input$x_value), y = n, color = !!sym(input$y_value))) +
+                        geom_jitter(size = 6, width = 0.2, height = 0.2, alpha = .6) +
+                        labs(title = paste("Jitter Plot of", input$x_value, "Over", input$y_value), x = input$x_value, y = input$y_value, color = input$x_value) +
+                        
+                        theme_minimal() +
+                        theme(panel.grid = element_line(linewidth = .5, color = "black"),
+                              axis.text.x = element_text(size = 15, hjust = 1, angle = 45, face = "bold", color = "black", margin = margin(t = 10)), 
+                              axis.text.y = element_text(size = 18, face = "bold", color = "black", margin = margin(l = 10)),
+                              plot.title = element_text(size = 25),
+                              axis.title = element_text(size = 20),
+                              legend.text = element_text(size = 15),
+                              legend.title = element_text(size = 18))}
+                else {
+                    ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), color = !!sym(input$y_value))) +
+                        geom_jitter(size = 6, width = 0.2, height = 0.2, alpha = .6) +
+                        labs(title = paste("Jitter Plot of", input$x_value, "Over", input$y_value), x = input$x_value, y = input$y_value, color = input$x_value) +
+                        
+                        theme_minimal() +
+                        theme(panel.grid = element_line(linewidth = .5, color = "black"),
+                              axis.text.x = element_text(size = 15, hjust = 1, angle = 45, face = "bold", color = "black", margin = margin(t = 10)), 
+                              axis.text.y = element_text(size = 18, face = "bold", color = "black", margin = margin(l = 10)),
+                              plot.title = element_text(size = 25),
+                              axis.title = element_text(size = 20),
+                              legend.text = element_text(size = 15),
+                              legend.title = element_text(size = 18))}}
             
             else if (input$plot_type == "Histogram") {
-                fdt <- fdt %>%
-                    group_by(!!sym(input$x_value)) %>%
-                    count(!!sym(input$y_value)) 
-                
-                ggplot(fdt, aes(x = !!sym(input$x_value), y = n, color = !!sym(input$y_value))) +
-                    geom_histogram(stat = "identity", position = "stack", binwidth = .5, fill = "lightblue", linewidth = 1.5) +
-                    labs(x = input$x_value, y = "Count", fill = input$y_value) +
+                if (is.character(fdt[[input$x_value]]) || is.factor(fdt[[input$x_value]])) {
+                    fdt <- fdt %>%
+                        group_by(!!sym(input$x_value)) %>%
+                        count(!!sym(input$y_value)) 
                     
-                    theme_minimal() + 
-                    theme(panel.grid = element_line(linewidth = .5, color = "black"),
-                          axis.text.x = element_text(size = 15, hjust = 1, angle = 45, face = "bold", color = "black", margin = margin(t = 10)), 
-                          axis.text.y = element_text(size = 18, face = "bold", color = "black", margin = margin(l = 10)),
-                          plot.title = element_text(size = 25),
-                          axis.title = element_text(size = 20),
-                          legend.text = element_text(size = 15),
-                          legend.title = element_text(size = 18))}
+                    ggplot(fdt, aes(x = !!sym(input$x_value), y = n, color = !!sym(input$y_value))) +
+                        geom_histogram(stat = "identity", position = "stack", binwidth = .5, fill = "lightblue", linewidth = 1.5) +
+                        labs(x = input$x_value, y = "Count", fill = input$y_value) +
+                        
+                        theme_minimal() + 
+                        theme(panel.grid = element_line(linewidth = .5, color = "black"),
+                              axis.text.x = element_text(size = 15, hjust = 1, angle = 45, face = "bold", color = "black", margin = margin(t = 10)), 
+                              axis.text.y = element_text(size = 18, face = "bold", color = "black", margin = margin(l = 10)),
+                              plot.title = element_text(size = 25),
+                              axis.title = element_text(size = 20),
+                              legend.text = element_text(size = 15),
+                              legend.title = element_text(size = 18))}
+                else {
+                    ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), color = !!sym(input$y_value))) +
+                        geom_histogram(stat = "identity", position = "stack", binwidth = .5, fill = "lightblue", linewidth = 1.5) +
+                        labs(x = input$x_value, y = "Count", fill = input$y_value) +
+                        
+                        theme_minimal() + 
+                        theme(panel.grid = element_line(linewidth = .5, color = "black"),
+                              axis.text.x = element_text(size = 15, hjust = 1, angle = 45, face = "bold", color = "black", margin = margin(t = 10)), 
+                              axis.text.y = element_text(size = 18, face = "bold", color = "black", margin = margin(l = 10)),
+                              plot.title = element_text(size = 25),
+                              axis.title = element_text(size = 20),
+                              legend.text = element_text(size = 15),
+                              legend.title = element_text(size = 18))}}
             
             else if (input$plot_type == "Lolipop") {
                 if (is.character(fdt[[input$x_value]]) || is.factor(fdt[[input$x_value]])) {
@@ -321,7 +349,7 @@ server = function(input, output, session) {
                               legend.title = element_text(size = 18))}
                 else {
                     ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value))) +
-                        geom_segment(aes(xend = !!sym(input$x_value), yend = !!sym(input$y_value, y = 0), color = "black", linewidth = 2)) +
+                        geom_segment(aes(xend = !!sym(input$x_value), yend = !!sym(input$y_value), y = 0), color = "black", linewidth = 2) +
                         geom_point(color = "black", size = 12) +
                         geom_point(color = "lightblue", size = 10) +
                         coord_flip() +
@@ -360,6 +388,6 @@ server = function(input, output, session) {
         }
     })
     
-    }
+}
 
 shinyApp(ui = ui, server = server)
