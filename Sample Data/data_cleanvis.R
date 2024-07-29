@@ -204,23 +204,35 @@ server = function(input, output, session) {
         req(fdt)
         
         if (input$plot_view == "Yes") {
-            
             if (input$plot_type == "Pie") {
-                fdt <- fdt %>%
-                    count(!!sym(input$y_value)) %>%
-                    mutate(percentage = n / sum(n) * 100)
-                
-                ggplot(fdt, aes(x = "", y = n, fill = !!sym(input$y_value))) +
-                    geom_bar(stat = "identity") +
-                    coord_polar(theta = "y") +
-                    labs(title = paste("Pie Chart of", input$y_value, "Elements"), fill = input$y_value) +
-                    geom_text(aes(label = paste0(round(percentage, 1), "%")),
-                              position = position_stack(vjust = .5), size = 7, color = "white") +
+                if (is.character(fdt[[input$x_value]]) || is.factor(fdt[[input$x_value]])) {
+                    fdt <- fdt %>%
+                        count(!!sym(input$y_value)) %>%
+                        mutate(percentage = n / sum(n) * 100)
                     
-                    theme_void() +
-                    theme(plot.title = element_text(size = 25),
-                          legend.text = element_text(size = 15),
-                          legend.title = element_text(size = 18))
+                    ggplot(fdt, aes(x = "", y = n, fill = !!sym(input$y_value))) +
+                        geom_bar(stat = "identity") +
+                        coord_polar(theta = "y") +
+                        labs(title = paste("Pie Chart of", input$y_value, "Elements"), fill = input$y_value) +
+                        geom_text(aes(label = paste0(round(percentage, 1), "%")),
+                                  position = position_stack(vjust = .5), size = 7, color = "white") +
+                        
+                        theme_void() +
+                        theme(plot.title = element_text(size = 25),
+                              legend.text = element_text(size = 15),
+                              legend.title = element_text(size = 18))}
+                else {
+                    gplot(fdt, aes(x = "", y = !!sym(input$y_value), fill = !!sym(input$y_value))) +
+                        geom_bar(stat = "identity") +
+                        coord_polar(theta = "y") +
+                        labs(title = paste("Pie Chart of", input$y_value, "Elements"), fill = input$y_value) +
+                        geom_text(aes(label = paste0(round(percentage, 1), "%")),
+                                  position = position_stack(vjust = .5), size = 7, color = "white") +
+                        
+                        theme_void() +
+                        theme(plot.title = element_text(size = 25),
+                              legend.text = element_text(size = 15),
+                              legend.title = element_text(size = 18))}}
                 
             } else if (input$plot_type == "Bar") {
                 fdt <- fdt %>%
@@ -243,22 +255,37 @@ server = function(input, output, session) {
                           legend.title = element_text(size = 18))
                 
             } else if (input$plot_type == "Scatter") {
-                fdt <- fdt %>%
-                    group_by(!!sym(input$x_value)) %>%
-                    count(!!sym(input$y_value)) 
-                
-                ggplot(fdt, aes(x = !!sym(input$x_value), y = n, color = !!sym(input$y_value))) +
-                    geom_point(size = 6, alpha = .8) +
-                    labs(title = paste("Scatter Plot of", input$x_value, "Over", input$y_value), x = input$x_value, y = input$y_value, color = input$x_value) +
+                if (is.character(fdt[[input$x_value]]) || is.factor(fdt[[input$x_value]])) {
+                    fdt <- fdt %>%
+                        group_by(!!sym(input$x_value)) %>%
+                        count(!!sym(input$y_value)) 
                     
-                    theme_minimal() +
-                    theme(panel.grid = element_line(linewidth = .5, color = "black"),
-                          axis.text.x = element_text(size = 15, hjust = 1, angle = 45, face = "bold", color = "black", margin = margin(t = 10)), 
-                          axis.text.y = element_text(size = 18, face = "bold", color = "black", margin = margin(l = 10)),
-                          plot.title = element_text(size = 25),
-                          axis.title = element_text(size = 20),
-                          legend.text = element_text(size = 15),
-                          legend.title = element_text(size = 18))}
+                    ggplot(fdt, aes(x = !!sym(input$x_value), y = n, color = !!sym(input$y_value))) +
+                        geom_point(size = 6, alpha = .8) +
+                        labs(title = paste("Scatter Plot of", input$x_value, "Over", input$y_value), x = input$x_value, y = input$y_value, color = input$x_value) +
+                        
+                        theme_minimal() +
+                        theme(panel.grid = element_line(linewidth = .5, color = "black"),
+                              axis.text.x = element_text(size = 15, hjust = 1, angle = 45, face = "bold", color = "black", margin = margin(t = 10)), 
+                              axis.text.y = element_text(size = 18, face = "bold", color = "black", margin = margin(l = 10)),
+                              plot.title = element_text(size = 25),
+                              axis.title = element_text(size = 20),
+                              legend.text = element_text(size = 15),
+                              legend.title = element_text(size = 18))}
+                
+                else {
+                    ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), color = !!sym(input$y_value))) +
+                        geom_point(size = 6, alpha = .8) +
+                        labs(title = paste("Scatter Plot of", input$x_value, "Over", input$y_value), x = input$x_value, y = input$y_value, color = input$x_value) +
+                        
+                        theme_minimal() +
+                        theme(panel.grid = element_line(linewidth = .5, color = "black"),
+                              axis.text.x = element_text(size = 15, hjust = 1, angle = 45, face = "bold", color = "black", margin = margin(t = 10)), 
+                              axis.text.y = element_text(size = 18, face = "bold", color = "black", margin = margin(l = 10)),
+                              plot.title = element_text(size = 25),
+                              axis.title = element_text(size = 20),
+                              legend.text = element_text(size = 15),
+                              legend.title = element_text(size = 18))}}
             
             else if (input$plot_type == "Jitter") {
                 if (is.character(fdt[[input$x_value]]) || is.factor(fdt[[input$x_value]])) {
