@@ -184,11 +184,11 @@ server = function(input, output, session) {
         
         if (input$plot_view == "Yes") {
             tagList(
+                selectInput("dvt", "Data Visualization Type?", choices = c("Numerical", "Categorical")),
                 selectInput("x_value", "X Value:", choices = colnames(fdt)),
                 selectInput("y_value", "Y Value:", choices = colnames(fdt)),
                 selectInput("fill", "Fill Value:", choices = colnames(fdt)),
-                selectInput("dvt", "Data Visualization Type?", choices = c("Numerical", "Categorical")),
-                radioButtons("plot_type", "Choose Visualization Type:", choices = ""), 
+                radioButtons("plot_type", "Choose Visualization Type:", choices = ""),
                 checkboxInput("vhide", "Hide Visualization?"))}
         else {
             NULL}})
@@ -244,7 +244,7 @@ output$plot <- renderPlot({
     
     if (input$plot_type == "Box") {
         ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), fill = !!sym(input$x_value))) +
-            geom_boxplot() +
+            geom_boxplot(size = 1) +
             labs(title = paste0("Box Plot of ",input$x_value, "Over ",input$y_value), x = input$x_value, y = input$y_value) + 
             gtheme}
     else {
