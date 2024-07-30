@@ -222,30 +222,32 @@ server = function(input, output, session) {
             show("fill")}
         else {
             hide("fill")
-            show("x_value")}})}
+            show("x_value")}})
 
-    output$plot <- renderPlot({
-        req(input$plot_view)
-        req(input$plot_type)
-        req(filtered_dt)
-        fdt <- filtered_dt()
-        req(fdt)
-        
-        gtheme <- theme_minimal() +
-            theme(panel.grid = element_line(color = "black", linewidth = .5)) +
-            theme(axis.text.x = element_text(size = 15, angle = 45, hjust = 1, face = "bold", color = "black",
-                                             margin = margin(b = 10)), 
-                  axis.text.y = element_text(size = 18, angle = 45, hjust = 1, face = "bold", color = "black",  
-                                             margin = margin(r = 10)),
-                  plot.title = element_text(size = 25),
-                  axis.title = element_text(size = 20),
-                  legend.text = element_text(size = 15),
-                  legend.title = element_text(size = 18))
-        
-        if (input$plot_type == "Box") {
-            ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), fill = !!sym(input$x_value))) +
-                geom_boxplot() +
-                labs(title = paste0("Box Plot of ",input$x_value, "Over ",input$y_value), x = input$x_value, y = input$y_value) + 
-                gtheme}
-        else {
-            NULL}})
+output$plot <- renderPlot({
+    req(input$plot_view)
+    req(input$plot_type)
+    req(filtered_dt)
+    fdt <- filtered_dt()
+    req(fdt)
+    
+    gtheme <- theme_minimal() +
+        theme(panel.grid = element_line(color = "black", linewidth = .5)) +
+        theme(axis.text.x = element_text(size = 15, angle = 45, hjust = 1, face = "bold", color = "black",
+                                         margin = margin(b = 10)), 
+              axis.text.y = element_text(size = 18, angle = 45, hjust = 1, face = "bold", color = "black",  
+                                         margin = margin(r = 10)),
+              plot.title = element_text(size = 25),
+              axis.title = element_text(size = 20),
+              legend.text = element_text(size = 15),
+              legend.title = element_text(size = 18))
+    
+    if (input$plot_type == "Box") {
+        ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), fill = !!sym(input$x_value))) +
+            geom_boxplot() +
+            labs(title = paste0("Box Plot of ",input$x_value, "Over ",input$y_value), x = input$x_value, y = input$y_value) + 
+            gtheme}
+    else {
+        NULL}})}
+
+shinyApp(ui = ui, server = server)
