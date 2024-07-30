@@ -184,10 +184,12 @@ server = function(input, output, session) {
         
         if (input$plot_view == "Yes") {
             tagList(
-                selectInput("dvt", "Data Visualization Type?", choices = c("Numerical", "Categorical")),
+                selectInput("dvt", "Data Visualization Type?", choices = c("--No selection", "Numerical", "Categorical")),
                 selectInput("x_value", "X Value:", choices = colnames(fdt)),
                 selectInput("y_value", "Y Value:", choices = colnames(fdt)),
-                selectInput("fill", "Fill Value:", choices = colnames(fdt)),
+                selectInput("groupby", "Grouped Variables?", choices = c("Yes", "No"), selected = "No"),
+                uiOutput("group_v"),
+                
                 radioButtons("plot_type", "Choose Visualization Type:", choices = ""),
                 checkboxInput("vhide", "Hide Visualization?"))}
         else {
@@ -210,20 +212,27 @@ server = function(input, output, session) {
         req(input$dvt)
         
         if (input$dvt == "Numerical") {
-            updateRadioButtons(session, "plot_type", choices = c("Box", "Scatter", "Histogram", "Line"))}
+            updateRadioButtons(session, "plot_type", choices = c("Box", "Scatter", "Histogram", "Line"))
+            show("plot_type")}
         else if (input$dvt == "Categorical") {
-            updateRadioButtons(session, "plot_type", choices = c("Bar", "Pie", "Density"))}})
+            updateRadioButtons(session, "plot_type", choices = c("Bar", "Pie", "Density"))
+            show("plot_type")}
+        else {
+            hide("plot_type")}})
     
     observeEvent(input$plot_type, {
+        req(input$dvt)
         req(input$plot_type)
         
-        if (input$plot_type %in% c("Pie", "Density")) {
-            hide("x_value") 
-            show("fill")}
-        else {
-            hide("fill")
-            show("y_value")
-            show("x_value")}})
+            if (input$plot_type %in% c("Histogram", "Pie", "Density")) {
+                show("groupby")
+                hide("x_value")}
+            else if (input$plot_type == "Histogram") {
+                hide("y_value")}
+            else {
+                hide("groupby")
+                show("y_value")
+                show("x_value")}})
 
 output$plot <- renderPlot({
     req(input$plot_view)
@@ -241,7 +250,8 @@ output$plot <- renderPlot({
               plot.title = element_text(size = 25),
               axis.title = element_text(size = 20),
               legend.text = element_text(size = 15),
-              legend.title = element_text(size = 18))
+              legend.title = element_text(size = 18, 
+                                          margin = margin(b = 10)))
     
     if (input$plot_type == "Box") {
         ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), fill = !!sym(input$x_value))) +
@@ -259,13 +269,43 @@ output$plot <- renderPlot({
         if (is.factor(fdt[[input$x_value]]) || is.character(fdt[[input$x_value]])) {
             ggplot(fdt, aes(x = !!sym(input$x_value))) +
                 geom_bar(fill = "darkblue", color = "black", alpha = .8) +
-                labs(title = paste0("Bar Plot of ", input$x_value), x = input$x_value, y = "Count") +
-                gtheme
-        } else {
+                labs(title = paste0("Histogram of ", input$x_value), x = input$x_value, y = "Count") +
+                gtheme}
+        else {
             ggplot(fdt, aes(x = !!sym(input$x_value))) +
                 geom_histogram(binwidth = .5, fill = "darkblue", color = "black", alpha = .8) +
                 labs(title = paste0("Histogram of ", input$x_value), x = input$x_value, y = "Count") +
                 gtheme}}
+    else if (input$plot_type == "Line") {
+        ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), color = !!sym(input$y_value))) +
+            geom_line(linewidth = 5) +
+            labs(title = paste0("Line Plot of ", input$x_value, "Over ", input$y_value), x = input$x_value, y = input$y_value) +
+            gtheme}
+    else if (input$plot_type == "Bar") {
+        ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), fill = !!sym(input$x_value))) +
+            geom_bar(stat = "identity", position = "dodge", linewidth = 1, color = "black", alpha = .8) +
+            labs(title = paste0("Bar Plot of ", input$x_value, "Over", input$y_value), x = input$x_value, y = input$y_value) +
+            gtheme}
+    else if (input$plot_type == "Pie") {
+        if (input$y_value %in% colnames(fdt)) {
+            fdt <- fdt %>%
+                count(!!sym(input$y_value)) %>%
+                mutate(percentage = n / sum(n) * 100)
+            
+            ggplot(fdt, aes(x = "", y = n, fill = !!sym(input$y_value))) +
+                geom_bar(stat = "identity", linewidth = 2, color = "white") +
+                coord_polar(theta = "y") +
+                labs(title = paste0("Pie Chart of ", input$y_value), fill = input$y_value) +
+                geom_text(aes(label = paste0(round(percentage, 1), "%")),
+                          position = position_stack(vjust = .5), size = 8, color = "white") +
+                
+                theme_void() +
+                theme(plot.title = element_text(size = 25),
+                      legend.text = element_text(size = 15),
+                      legend.title = element_text(size = 18, 
+                                                  margin = margin(b = 10)))}
+        else {
+            showNotification("The selected column does not exist in the data frame.", type = "error")}}
 
 })}
 
