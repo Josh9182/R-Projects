@@ -222,6 +222,7 @@ server = function(input, output, session) {
             show("fill")}
         else {
             hide("fill")
+            show("y_value")
             show("x_value")}})
 
 output$plot <- renderPlot({
@@ -245,9 +246,27 @@ output$plot <- renderPlot({
     if (input$plot_type == "Box") {
         ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), fill = !!sym(input$x_value))) +
             geom_boxplot(size = 1) +
-            labs(title = paste0("Box Plot of ",input$x_value, "Over ",input$y_value), x = input$x_value, y = input$y_value) + 
+            labs(title = paste0("Box Plot of ",input$x_value, " By ",input$y_value), x = input$x_value, y = input$y_value) + 
             gtheme}
-    else {
-        NULL}})}
+    
+    else if (input$plot_type == "Scatter") {
+        ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), color = !!sym(input$x_value))) +
+            geom_point(size = 6, alpha = .8) +
+            labs(title = paste0("Scatter Plot of ",input$x_value, " By ",input$y_value), x = input$x_value, y = input$y_value) + 
+            gtheme}
+
+    else if (input$plot_type == "Histogram") {
+        if (is.factor(fdt[[input$x_value]]) || is.character(fdt[[input$x_value]])) {
+            ggplot(fdt, aes(x = !!sym(input$x_value))) +
+                geom_bar(fill = "darkblue", color = "black", alpha = .8) +
+                labs(title = paste0("Bar Plot of ", input$x_value), x = input$x_value, y = "Count") +
+                gtheme
+        } else {
+            ggplot(fdt, aes(x = !!sym(input$x_value))) +
+                geom_histogram(binwidth = .5, fill = "darkblue", color = "black", alpha = .8) +
+                labs(title = paste0("Histogram of ", input$x_value), x = input$x_value, y = "Count") +
+                gtheme}}
+
+})}
 
 shinyApp(ui = ui, server = server)
