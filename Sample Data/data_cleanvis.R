@@ -276,7 +276,7 @@ output$plot <- renderPlotly({
               legend.title = element_text(size = 18, 
                                           margin = margin(b = 10)))
     
-    if (input$plot_type %in% c("Pie", "Histogram")) {
+    if (input$plot_type == "Histogram") {
         if (input$groupby == "Yes" && input$grouper %in% colnames(fdt)) {
             fdt <- fdt %>%
                 group_by(!!sym(input$grouper)) %>%
@@ -293,9 +293,13 @@ output$plot <- renderPlotly({
                 mutate(percentage = n / sum(n) * 100)
             
             print(fdt)}
-        else {
-            showNotification("Invalid or missing column for grouping.", type = "error")
-            return(NULL)}}
+        
+    else {
+        fdt <- fdt %>%
+            count(!!sym(input$y_value)) %>%
+            mutate(percentage = n / sum(n) * 100)
+        
+        print(fdt)}}
     
     if (input$plot_type == "Box") {
         boxp <- ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), fill = !!sym(input$x_value))) +
@@ -340,7 +344,6 @@ output$plot <- renderPlotly({
         ggplotly(barp)}
     
     else if (input$plot_type == "Pie") {
-        if (input$groupby == "No") {
             piep <- ggplot(fdt, aes(x = "", y = n, fill = !!sym(input$y_value))) +
                     geom_bar(stat = "identity", linewidth = 1, color = "white") +
                     coord_polar(theta = "y") +
@@ -353,23 +356,8 @@ output$plot <- renderPlotly({
                         legend.title = element_text(size = 18, 
                                                   margin = margin(b = 10)))
             ggplotly(piep)}
-        
-        else if (input$groupby == "Yes") {
-            piep <- ggplot(fdt, aes(x = "", y = n, fill = !!sym(input$grouper))) +
-                    geom_bar(stat = "identity", linewidth = 1, color = "white") +
-                    coord_polar(theta = "y") +
-                    labs(title = paste0("Pie Chart of ", input$y_value), fill = input$grouper) +
-                    geom_text(aes(label = paste0(round(percentage, 1), "%")),
-                            position = position_stack(vjust = .5), size = 6, color = "white") +
-                    theme_void() +
-                    theme(plot.title = element_text(size = 25),
-                        legend.text = element_text(size = 15),
-                        legend.title = element_text(size = 18, 
-                                                  margin = margin(b = 10)))
-            ggplotly(piep)}
-        else {
-            showNotification("The selected groupby column does not exist in the data frame.", type = "error")}}})
+    else {
+        showNotification("The selected groupby column does not exist in the data frame.", type = "error")}})}
     
-   }
 
 shinyApp(ui = ui, server = server)
