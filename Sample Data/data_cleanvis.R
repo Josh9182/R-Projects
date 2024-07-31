@@ -203,10 +203,10 @@ server = function(input, output, session) {
         
         if (input$y_value %in% colnames(fdt)) {
             
-        if (input$groupby == "Yes") {
-            selectInput("grouper", "Columns to Group:", choices = colnames(fdt))}
-        else {
-            NULL}}})
+            if (input$groupby == "Yes") {
+                selectInput("grouper", "Columns to Group:", choices = colnames(fdt))}
+            else {
+                NULL}}})
     
     output$download <- renderUI({
         req(input$table_view)
@@ -237,16 +237,16 @@ server = function(input, output, session) {
         req(input$dvt)
         req(input$plot_type)
         
-            if (input$plot_type %in% c("Histogram", "Pie", "Density")) {
-                show("groupby")
-                hide("x_value")}
-            else if (input$plot_type == "Histogram") {
-                hide("y_value")}
-            else {
-                hide("groupby")
-                show("y_value")
-                show("x_value")}})
-
+        if (input$plot_type %in% c("Histogram", "Pie", "Density")) {
+            show("groupby")
+            hide("x_value")}
+        else if (input$plot_type == "Histogram") {
+            hide("y_value")}
+        else {
+            hide("groupby")
+            show("y_value")
+            show("x_value")}})
+    
     output$plot <- renderPlot({
         req(input$plot_view)
         req(input$plot_type)
@@ -266,69 +266,82 @@ server = function(input, output, session) {
                   legend.title = element_text(size = 18, 
                                               margin = margin(b = 10)))
         
-        if (input$plot_type == "Box") {
-            ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), fill = !!sym(input$x_value))) +
-                geom_boxplot(size = 1) +
-                labs(title = paste0("Box Plot of ",input$x_value, " By ",input$y_value), x = input$x_value, y = input$y_value) + 
-                gtheme}
-        
-        else if (input$plot_type == "Scatter") {
-            ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), color = !!sym(input$x_value))) +
-                geom_point(size = 6, alpha = .8) +
-                labs(title = paste0("Scatter Plot of ",input$x_value, " By ",input$y_value), x = input$x_value, y = input$y_value) + 
-                gtheme}
-        
-        else if (input$plot_type == "Histogram") {
-            if (is.factor(fdt[[input$x_value]]) || is.character(fdt[[input$x_value]])) {
-                if (input$groupby == "Yes") {
-                    fdt <- fdt %>%
-                        group_by(!!sym(input$grouper)) %>%
-                        summarise(count = n(), .groups = "drop")
-                    
-                    ggplot(fdt, aes(x = !!sym(input$x_value), fill = !!sym(input$grouper))) +
-                        geom_bar(fill = "darkblue", color = "black", alpha = .8) +
-                        labs(title = paste0("Histogram of ", input$x_value), x = input$x_value, y = "Count") +
-                        gtheme}
+        if (input$plot_type %in% c("Pie", "Histogram")) {
+            if (input$groupby == "Yes" && input$grouper %in% colnames(fdt)) {
+                fdt <- fdt %>%
+                    group_by(!!sym(input$grouper)) %>%
+                    count(!!sym(input$y_value)) %>%
+                    group_by(!!sym(input$grouper)) %>%
+                    mutate(percentage = n / sum(n) * 100) %>%
+                    ungroup()
                 
-                else {
-                    ggplot(fdt, aes(x = !!sym(input$x_value))) +
-                        geom_bar(fill = "darkblue", color = "black", alpha = .8) +
-                        labs(title = paste0("Histogram of ", input$x_value), x = input$x_value, y = "Count") +
-                        gtheme}}
-            else {
-                showNotification("The selected column does not exist in the data frame.", type = "error")}}
-        
-        else if (input$plot_type == "Line") {
-            ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), color = !!sym(input$y_value))) +
-                geom_line(linewidth = 5) +
-                labs(title = paste0("Line Plot of ", input$x_value, "Over ", input$y_value), x = input$x_value, y = input$y_value) +
-                gtheme}
-        
-        else if (input$plot_type == "Bar") {
-            ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), fill = !!sym(input$x_value))) +
-                geom_bar(stat = "identity", position = "dodge", linewidth = 1, color = "black", alpha = .8) +
-                labs(title = paste0("Bar Plot of ", input$x_value, "Over", input$y_value), x = input$x_value, y = input$y_value) +
-                gtheme}
-        
-        else if (input$plot_type == "Pie") {
-            if (input$y_value %in% colnames(fdt)) {
+                print(fdt)}
+            
+            else if (input$groupby == "No") {
                 fdt <- fdt %>%
                     count(!!sym(input$y_value)) %>%
                     mutate(percentage = n / sum(n) * 100)
                 
+                print(fdt)}
+            else {
+                showNotification("Invalid or missing column for grouping.", type = "error")
+                return(NULL)}}
+        
+        if (input$plot_type == "Box") {
+            ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), fill = !!sym(input$x_value))) +
+                geom_boxplot(size = 1) +
+                labs(title = paste0("Box Plot of ", input$x_value, " By ", input$y_value), x = input$x_value, y = input$y_value) + 
+                gtheme}
+        else if (input$plot_type == "Scatter") {
+            ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), color = !!sym(input$x_value))) +
+                geom_point(size = 6, alpha = .8) +
+                labs(title = paste0("Scatter Plot of ", input$x_value, " By ", input$y_value), x = input$x_value, y = input$y_value) + 
+                gtheme}
+        else if (input$plot_type == "Histogram") {
+            if (is.factor(fdt[[input$x_value]]) || is.character(fdt[[input$x_value]])) {
+                ggplot(fdt, aes(x = !!sym(input$x_value))) +
+                    geom_bar(fill = "darkblue", color = "black", alpha = .8) +
+                    labs(title = paste0("Histogram of ", input$x_value), x = input$x_value, y = "Count") +
+                    gtheme}
+            else {
+                showNotification("The selected column does not exist in the data frame.", type = "error")}}
+        else if (input$plot_type == "Line") {
+            ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), color = !!sym(input$y_value))) +
+                geom_line(linewidth = 5) +
+                labs(title = paste0("Line Plot of ", input$x_value, " Over ", input$y_value), x = input$x_value, y = input$y_value) +
+                gtheme}
+        else if (input$plot_type == "Bar") {
+            ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), fill = !!sym(input$x_value))) +
+                geom_bar(stat = "identity", position = "dodge", linewidth = 1, color = "black", alpha = .8) +
+                labs(title = paste0("Bar Plot of ", input$x_value, " Over ", input$y_value), x = input$x_value, y = input$y_value) +
+                gtheme}
+        else if (input$plot_type == "Pie") {
+            if (input$groupby == "No") {
                 ggplot(fdt, aes(x = "", y = n, fill = !!sym(input$y_value))) +
-                    geom_bar(stat = "identity", linewidth = 2, color = "white") +
+                    geom_bar(stat = "identity", linewidth = 1, color = "white") +
                     coord_polar(theta = "y") +
                     labs(title = paste0("Pie Chart of ", input$y_value), fill = input$y_value) +
                     geom_text(aes(label = paste0(round(percentage, 1), "%")),
-                              position = position_stack(vjust = .5), size = 8, color = "white") +
-                    
+                              position = position_stack(vjust = .5), size = 6, color = "white") +
+                    theme_void() +
+                    theme(plot.title = element_text(size = 25),
+                          legend.text = element_text(size = 15),
+                          legend.title = element_text(size = 18, 
+                                                      margin = margin(b = 10)))}
+            
+            else if (input$groupby == "Yes" && input$grouper %in% colnames(fdt)) {
+                ggplot(fdt, aes(x = "", y = n, fill = !!sym(input$grouper))) +
+                    geom_bar(stat = "identity", linewidth = 1, color = "white") +
+                    coord_polar(theta = "y") +
+                    labs(title = paste0("Pie Chart of ", input$y_value), fill = input$grouper) +
+                    geom_text(aes(label = paste0(round(percentage, 1), "%")),
+                              position = position_stack(vjust = .5), size = 6, color = "white") +
                     theme_void() +
                     theme(plot.title = element_text(size = 25),
                           legend.text = element_text(size = 15),
                           legend.title = element_text(size = 18, 
                                                       margin = margin(b = 10)))}
             else {
-                showNotification("The selected column does not exist in the data frame.", type = "error")}}})}
+                showNotification("The selected groupby column does not exist in the data frame.", type = "error")}}})}
 
 shinyApp(ui = ui, server = server)
