@@ -9,6 +9,7 @@ library(tidyverse)
 library(shiny)
 library(shinyjs)
 library(ggplot2)
+library(plotly)
 
 ui <- fluidPage(
     useShinyjs(), 
@@ -22,7 +23,7 @@ ui <- fluidPage(
         mainPanel(
             uiOutput("uio"),
             DTOutput("table"),
-            plotOutput("plot", height = 800, width = 1000))))
+            plotlyOutput("plot", height = 800, width = 1200))))
 
 server = function(input, output, session) {
     data <- reactive({
@@ -215,9 +216,7 @@ server = function(input, output, session) {
         if (input$table_view == "Yes" || input$plot_view == "Yes") {
             tagList(
                 if (input$table_view == "Yes") {
-                    downloadButton("download_file", "Download Data File:")},
-                if (input$plot_view == "Yes") {
-                    downloadButton("download_vis", "Download Visualization File:")})}
+                    downloadButton("download_file", "Download Data File:")})}
         else {
             NULL}})
     
@@ -246,102 +245,112 @@ server = function(input, output, session) {
             hide("groupby")
             show("y_value")
             show("x_value")}})
+
+output$plot <- renderPlotly({
+    req(input$plot_view)
+    req(input$plot_type)
+    req(filtered_dt)
+    fdt <- filtered_dt()
+    req(fdt)
     
-    output$plot <- renderPlot({
-        req(input$plot_view)
-        req(input$plot_type)
-        req(filtered_dt)
-        fdt <- filtered_dt()
-        req(fdt)
-        
-        gtheme <- theme_minimal() +
-            theme(panel.grid = element_line(color = "black", linewidth = .5)) +
-            theme(axis.text.x = element_text(size = 15, angle = 45, hjust = 1, face = "bold", color = "black",
-                                             margin = margin(b = 10)), 
-                  axis.text.y = element_text(size = 18, angle = 45, hjust = 1, face = "bold", color = "black",  
-                                             margin = margin(r = 10)),
-                  plot.title = element_text(size = 25),
-                  axis.title = element_text(size = 20),
-                  legend.text = element_text(size = 15),
-                  legend.title = element_text(size = 18, 
-                                              margin = margin(b = 10)))
-        
-        if (input$plot_type %in% c("Pie", "Histogram")) {
-            if (input$groupby == "Yes" && input$grouper %in% colnames(fdt)) {
-                fdt <- fdt %>%
-                    group_by(!!sym(input$grouper)) %>%
-                    count(!!sym(input$y_value)) %>%
-                    group_by(!!sym(input$grouper)) %>%
-                    mutate(percentage = n / sum(n) * 100) %>%
-                    ungroup()
-                
-                print(fdt)}
+    gtheme <- theme_minimal() +
+        theme(panel.grid = element_line(color = "black", linewidth = .5)) +
+        theme(axis.text.x = element_text(size = 15, angle = 45, hjust = 1, face = "bold", color = "black",
+                                         margin = margin(b = 10)), 
+              axis.text.y = element_text(size = 18, angle = 45, hjust = 1, face = "bold", color = "black",  
+                                         margin = margin(r = 10)),
+              plot.title = element_text(size = 25),
+              axis.title = element_text(size = 20),
+              legend.text = element_text(size = 15),
+              legend.title = element_text(size = 18, 
+                                          margin = margin(b = 10)))
+    
+    if (input$plot_type %in% c("Pie", "Histogram")) {
+        if (input$groupby == "Yes" && input$grouper %in% colnames(fdt)) {
+            fdt <- fdt %>%
+                group_by(!!sym(input$grouper)) %>%
+                count(!!sym(input$y_value)) %>%
+                group_by(!!sym(input$grouper)) %>%
+                mutate(percentage = n / sum(n) * 100) %>%
+                ungroup()
             
-            else if (input$groupby == "No") {
-                fdt <- fdt %>%
-                    count(!!sym(input$y_value)) %>%
-                    mutate(percentage = n / sum(n) * 100)
-                
-                print(fdt)}
-            else {
-                showNotification("Invalid or missing column for grouping.", type = "error")
-                return(NULL)}}
+            print(fdt)}
         
-        if (input$plot_type == "Box") {
-            ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), fill = !!sym(input$x_value))) +
+        else if (input$groupby == "No") {
+            fdt <- fdt %>%
+                count(!!sym(input$y_value)) %>%
+                mutate(percentage = n / sum(n) * 100)
+            
+            print(fdt)}
+        else {
+            showNotification("Invalid or missing column for grouping.", type = "error")
+            return(NULL)}}
+    
+    if (input$plot_type == "Box") {
+        boxp <- ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), fill = !!sym(input$x_value))) +
                 geom_boxplot(size = 1) +
                 labs(title = paste0("Box Plot of ", input$x_value, " By ", input$y_value), x = input$x_value, y = input$y_value) + 
-                gtheme}
-        else if (input$plot_type == "Scatter") {
-            ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), color = !!sym(input$x_value))) +
-                geom_point(size = 6, alpha = .8) +
+                gtheme
+        ggplotly(boxp)}
+    
+    else if (input$plot_type == "Scatter") {
+        scatp <- ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), color = !!sym(input$x_value))) +
+                geom_point(size = 4, alpha = .6) +
                 labs(title = paste0("Scatter Plot of ", input$x_value, " By ", input$y_value), x = input$x_value, y = input$y_value) + 
-                gtheme}
-        else if (input$plot_type == "Histogram") {
-            if (is.factor(fdt[[input$x_value]]) || is.character(fdt[[input$x_value]])) {
-                ggplot(fdt, aes(x = !!sym(input$x_value))) +
+                gtheme
+        ggplotly(scatp)}
+    
+    else if (input$plot_type == "Histogram") {
+        if (input$groupby == "Yes" && input$grouper %in% colnames(fdt)) {
+            histp <- ggplot(fdt, aes(x = !!sym(input$x_value))) +
                     geom_bar(fill = "darkblue", color = "black", alpha = .8) +
-                    labs(title = paste0("Histogram of ", input$x_value), x = input$x_value, y = "Count") +
-                    gtheme}
-            else {
-                showNotification("The selected column does not exist in the data frame.", type = "error")}}
-        else if (input$plot_type == "Line") {
-            ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), color = !!sym(input$y_value))) +
-                geom_line(linewidth = 5) +
-                labs(title = paste0("Line Plot of ", input$x_value, " Over ", input$y_value), x = input$x_value, y = input$y_value) +
-                gtheme}
-        else if (input$plot_type == "Bar") {
-            ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), fill = !!sym(input$x_value))) +
-                geom_bar(stat = "identity", position = "dodge", linewidth = 1, color = "black", alpha = .8) +
-                labs(title = paste0("Bar Plot of ", input$x_value, " Over ", input$y_value), x = input$x_value, y = input$y_value) +
-                gtheme}
-        else if (input$plot_type == "Pie") {
-            if (input$groupby == "No") {
-                ggplot(fdt, aes(x = "", y = n, fill = !!sym(input$y_value))) +
-                    geom_bar(stat = "identity", linewidth = 1, color = "white") +
-                    coord_polar(theta = "y") +
-                    labs(title = paste0("Pie Chart of ", input$y_value), fill = input$y_value) +
-                    geom_text(aes(label = paste0(round(percentage, 1), "%")),
-                              position = position_stack(vjust = .5), size = 6, color = "white") +
-                    theme_void() +
-                    theme(plot.title = element_text(size = 25),
-                          legend.text = element_text(size = 15),
-                          legend.title = element_text(size = 18, 
-                                                      margin = margin(b = 10)))}
-            
-            else if (input$groupby == "Yes" && input$grouper %in% colnames(fdt)) {
-                ggplot(fdt, aes(x = "", y = n, fill = !!sym(input$grouper))) +
-                    geom_bar(stat = "identity", linewidth = 1, color = "white") +
-                    coord_polar(theta = "y") +
-                    labs(title = paste0("Pie Chart of ", input$y_value), fill = input$grouper) +
-                    geom_text(aes(label = paste0(round(percentage, 1), "%")),
-                              position = position_stack(vjust = .5), size = 6, color = "white") +
-                    theme_void() +
-                    theme(plot.title = element_text(size = 25),
-                          legend.text = element_text(size = 15),
-                          legend.title = element_text(size = 18, 
-                                                      margin = margin(b = 10)))}
-            else {
-                showNotification("The selected groupby column does not exist in the data frame.", type = "error")}}})}
+                    labs(title = paste0("Histogram of ", input$x_value), x = input$x_value, y = paste0("Count of ", input$grouper)) +
+                    gtheme
+            ggplotly(histp)}
+        else if (input$groupby == "No") {
+            histp <- ggplot(fdt, aes(x = !!sym(input$x_value))) +
+                geom_bar(fill = "darkblue", color = "black", alpha = .8) +
+                labs(title = paste0("Histogram of ", input$x_value), x = input$x_value, y = "Count") +
+                gtheme
+            ggplotly(histp)}}
+    
+    else if (input$plot_type == "Line") {
+        ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), color = !!sym(input$y_value))) +
+            geom_line(linewidth = 5) +
+            labs(title = paste0("Line Plot of ", input$x_value, " Over ", input$y_value), x = input$x_value, y = input$y_value) +
+            gtheme}
+    else if (input$plot_type == "Bar") {
+        ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), fill = !!sym(input$x_value))) +
+            geom_bar(stat = "identity", position = "dodge", linewidth = 1, color = "black", alpha = .8) +
+            labs(title = paste0("Bar Plot of ", input$x_value, " Over ", input$y_value), x = input$x_value, y = input$y_value) +
+            gtheme}
+    else if (input$plot_type == "Pie") {
+        if (input$groupby == "No") {
+            ggplot(fdt, aes(x = "", y = n, fill = !!sym(input$y_value))) +
+                geom_bar(stat = "identity", linewidth = 1, color = "white") +
+                coord_polar(theta = "y") +
+                labs(title = paste0("Pie Chart of ", input$y_value), fill = input$y_value) +
+                geom_text(aes(label = paste0(round(percentage, 1), "%")),
+                          position = position_stack(vjust = .5), size = 6, color = "white") +
+                theme_void() +
+                theme(plot.title = element_text(size = 25),
+                      legend.text = element_text(size = 15),
+                      legend.title = element_text(size = 18, 
+                                                  margin = margin(b = 10)))}
+        
+        else if (input$groupby == "Yes" && input$grouper %in% colnames(fdt)) {
+            ggplot(fdt, aes(x = "", y = n, fill = !!sym(input$grouper))) +
+                geom_bar(stat = "identity", linewidth = 1, color = "white") +
+                coord_polar(theta = "y") +
+                labs(title = paste0("Pie Chart of ", input$y_value), fill = input$grouper) +
+                geom_text(aes(label = paste0(round(percentage, 1), "%")),
+                          position = position_stack(vjust = .5), size = 6, color = "white") +
+                theme_void() +
+                theme(plot.title = element_text(size = 25),
+                      legend.text = element_text(size = 15),
+                      legend.title = element_text(size = 18, 
+                                                  margin = margin(b = 10)))}
+        else {
+            showNotification("The selected groupby column does not exist in the data frame.", type = "error")}}})}
 
 shinyApp(ui = ui, server = server)
