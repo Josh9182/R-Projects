@@ -152,6 +152,14 @@ server = function(input, output, session) {
             return(NULL)}
         datatable(fdt)})
     
+    observeEvent(input$table_view, {
+        if (input$table_view == "No") {
+            output$table <- renderDT({NULL})}
+        else if (input$table_view == "Yes") {
+            output$table <- renderDT({
+                fdt <- filtered_dt()
+                datatable(fdt)})}})
+    
     observeEvent(input$hide, {
         if (input$hide) {
             output$table <- renderDT({NULL})
@@ -190,8 +198,8 @@ server = function(input, output, session) {
                 selectInput("y_value", "Y Value:", choices = colnames(fdt)),
                 selectInput("groupby", "Grouped Variables?", choices = c("Yes", "No"), selected = "No"),
                 uiOutput("group_v"),
-                
-                radioButtons("plot_type", "Choose Visualization Type:", choices = ""),
+            
+                radioButtons("plot_type", "", choices = ""),
                 checkboxInput("vhide", "Hide Visualization?"))}
         else {
             NULL}})
@@ -224,7 +232,7 @@ server = function(input, output, session) {
         req(input$dvt)
         
         if (input$dvt == "Numerical") {
-            updateRadioButtons(session, "plot_type", choices = c("Box", "Scatter", "Histogram", "Line"))
+            updateRadioButtons(session, "plot_type", "Plot Type:", choices = c("Box", "Scatter", "Histogram", "Line"))
             show("plot_type")}
         else if (input$dvt == "Categorical") {
             updateRadioButtons(session, "plot_type", choices = c("Bar", "Pie", "Density"))
@@ -241,8 +249,11 @@ server = function(input, output, session) {
             hide("x_value")}
         else if (input$plot_type == "Histogram") {
             hide("y_value")}
+        else if (input$plot_type == "Line") {
+            hide("groupby")}
         else {
             hide("groupby")
+            hide("grouper")
             show("y_value")
             show("x_value")}})
 
@@ -257,7 +268,7 @@ output$plot <- renderPlotly({
         theme(panel.grid = element_line(color = "black", linewidth = .5)) +
         theme(axis.text.x = element_text(size = 15, angle = 45, hjust = 1, face = "bold", color = "black",
                                          margin = margin(b = 10)), 
-              axis.text.y = element_text(size = 18, angle = 45, hjust = 1, face = "bold", color = "black",  
+              axis.text.y = element_text(size = 15, angle = 45, hjust = 1, face = "bold", color = "black",  
                                          margin = margin(r = 10)),
               plot.title = element_text(size = 25),
               axis.title = element_text(size = 20),
@@ -315,42 +326,50 @@ output$plot <- renderPlotly({
             ggplotly(histp)}}
     
     else if (input$plot_type == "Line") {
-        ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), color = !!sym(input$y_value))) +
-            geom_line(linewidth = 5) +
-            labs(title = paste0("Line Plot of ", input$x_value, " Over ", input$y_value), x = input$x_value, y = input$y_value) +
-            gtheme}
+        linep <- ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), color = !!sym(input$y_value))) +
+                geom_line(linewidth = 5) +
+                labs(title = paste0("Line Plot of ", input$x_value, " Over ", input$y_value), x = input$x_value, y = input$y_value) +
+                gtheme
+        ggplotly(linep)}
+    
     else if (input$plot_type == "Bar") {
-        ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), fill = !!sym(input$x_value))) +
-            geom_bar(stat = "identity", position = "dodge", linewidth = 1, color = "black", alpha = .8) +
-            labs(title = paste0("Bar Plot of ", input$x_value, " Over ", input$y_value), x = input$x_value, y = input$y_value) +
-            gtheme}
+        barp <- ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), fill = !!sym(input$x_value))) +
+                geom_bar(stat = "identity", position = "dodge", linewidth = .5, color = "black", alpha = .8) +
+                labs(title = paste0("Bar Plot of ", input$x_value, " Over ", input$y_value), x = input$x_value, y = input$y_value) +
+                gtheme
+        ggplotly(barp)}
+    
     else if (input$plot_type == "Pie") {
         if (input$groupby == "No") {
-            ggplot(fdt, aes(x = "", y = n, fill = !!sym(input$y_value))) +
-                geom_bar(stat = "identity", linewidth = 1, color = "white") +
-                coord_polar(theta = "y") +
-                labs(title = paste0("Pie Chart of ", input$y_value), fill = input$y_value) +
-                geom_text(aes(label = paste0(round(percentage, 1), "%")),
-                          position = position_stack(vjust = .5), size = 6, color = "white") +
-                theme_void() +
-                theme(plot.title = element_text(size = 25),
-                      legend.text = element_text(size = 15),
-                      legend.title = element_text(size = 18, 
-                                                  margin = margin(b = 10)))}
+            piep <- ggplot(fdt, aes(x = "", y = n, fill = !!sym(input$y_value))) +
+                    geom_bar(stat = "identity", linewidth = 1, color = "white") +
+                    coord_polar(theta = "y") +
+                    labs(title = paste0("Pie Chart of ", input$y_value), fill = input$y_value) +
+                    geom_text(aes(label = paste0(round(percentage, 1), "%")),
+                            position = position_stack(vjust = .5), size = 6, color = "white") +
+                    theme_void() +
+                    theme(plot.title = element_text(size = 25),
+                        legend.text = element_text(size = 15),
+                        legend.title = element_text(size = 18, 
+                                                  margin = margin(b = 10)))
+            ggplotly(piep)}
         
-        else if (input$groupby == "Yes" && input$grouper %in% colnames(fdt)) {
-            ggplot(fdt, aes(x = "", y = n, fill = !!sym(input$grouper))) +
-                geom_bar(stat = "identity", linewidth = 1, color = "white") +
-                coord_polar(theta = "y") +
-                labs(title = paste0("Pie Chart of ", input$y_value), fill = input$grouper) +
-                geom_text(aes(label = paste0(round(percentage, 1), "%")),
-                          position = position_stack(vjust = .5), size = 6, color = "white") +
-                theme_void() +
-                theme(plot.title = element_text(size = 25),
-                      legend.text = element_text(size = 15),
-                      legend.title = element_text(size = 18, 
-                                                  margin = margin(b = 10)))}
+        else if (input$groupby == "Yes") {
+            piep <- ggplot(fdt, aes(x = "", y = n, fill = !!sym(input$grouper))) +
+                    geom_bar(stat = "identity", linewidth = 1, color = "white") +
+                    coord_polar(theta = "y") +
+                    labs(title = paste0("Pie Chart of ", input$y_value), fill = input$grouper) +
+                    geom_text(aes(label = paste0(round(percentage, 1), "%")),
+                            position = position_stack(vjust = .5), size = 6, color = "white") +
+                    theme_void() +
+                    theme(plot.title = element_text(size = 25),
+                        legend.text = element_text(size = 15),
+                        legend.title = element_text(size = 18, 
+                                                  margin = margin(b = 10)))
+            ggplotly(piep)}
         else {
-            showNotification("The selected groupby column does not exist in the data frame.", type = "error")}}})}
+            showNotification("The selected groupby column does not exist in the data frame.", type = "error")}}})
+    
+   }
 
 shinyApp(ui = ui, server = server)
