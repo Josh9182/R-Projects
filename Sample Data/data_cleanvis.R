@@ -193,16 +193,25 @@ server = function(input, output, session) {
         
         if (input$plot_view == "Yes") {
             tagList(
-                selectInput("dvt", "Data Visualization Type?", choices = c("--No selection", "Numerical", "Categorical")),
+                selectInput("dvt", "Data Visualization Type?", choices = c("--No Selection", "Numerical", "Categorical")),
+                uiOutput("dvtui"))}
+        else if (input$plot_view == "No") {
+            return(NULL)}})
+    
+    output$dvtui <- renderUI({
+        req(input$dvt)
+        req(filtered_dt)
+        fdt <- filtered_dt()
+        
+        if (input$dvt != "--No Selection") {
+            tagList(
                 selectInput("x_value", "X Value:", choices = colnames(fdt)),
                 selectInput("y_value", "Y Value:", choices = colnames(fdt)),
                 selectInput("groupby", "Grouped Variables?", choices = c("Yes", "No"), selected = "No"),
                 uiOutput("group_v"),
-            
+                
                 radioButtons("plot_type", "", choices = ""),
-                checkboxInput("vhide", "Hide Visualization?"))}
-        else {
-            NULL}})
+                checkboxInput("vhide", "Hide Visualization?"))}})
     
     output$group_v <- renderUI({
         req(input$groupby)
@@ -276,7 +285,7 @@ output$plot <- renderPlotly({
               legend.title = element_text(size = 18, 
                                           margin = margin(b = 10)))
     
-    if (input$plot_type == "Histogram") {
+    if (input$plot_type %in% c("Histogram", "Pie")) {
         if (input$groupby == "Yes" && input$grouper %in% colnames(fdt)) {
             fdt <- fdt %>%
                 group_by(!!sym(input$grouper)) %>%
@@ -285,7 +294,7 @@ output$plot <- renderPlotly({
                 mutate(percentage = n / sum(n) * 100) %>%
                 ungroup()
             
-            print(fdt)}
+            print(fdt)}}
         
         else if (input$groupby == "No") {
             fdt <- fdt %>%
@@ -294,12 +303,7 @@ output$plot <- renderPlotly({
             
             print(fdt)}
         
-    else {
-        fdt <- fdt %>%
-            count(!!sym(input$y_value)) %>%
-            mutate(percentage = n / sum(n) * 100)
-        
-        print(fdt)}}
+    print(fdt)
     
     if (input$plot_type == "Box") {
         boxp <- ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), fill = !!sym(input$x_value))) +
@@ -341,23 +345,7 @@ output$plot <- renderPlotly({
                 geom_bar(stat = "identity", position = "dodge", linewidth = .5, color = "black", alpha = .8) +
                 labs(title = paste0("Bar Plot of ", input$x_value, " Over ", input$y_value), x = input$x_value, y = input$y_value) +
                 gtheme
-        ggplotly(barp)}
-    
-    else if (input$plot_type == "Pie") {
-            piep <- ggplot(fdt, aes(x = "", y = n, fill = !!sym(input$y_value))) +
-                    geom_bar(stat = "identity", linewidth = 1, color = "white") +
-                    coord_polar(theta = "y") +
-                    labs(title = paste0("Pie Chart of ", input$y_value), fill = input$y_value) +
-                    geom_text(aes(label = paste0(round(percentage, 1), "%")),
-                            position = position_stack(vjust = .5), size = 6, color = "white") +
-                    theme_void() +
-                    theme(plot.title = element_text(size = 25),
-                        legend.text = element_text(size = 15),
-                        legend.title = element_text(size = 18, 
-                                                  margin = margin(b = 10)))
-            ggplotly(piep)}
-    else {
-        showNotification("The selected groupby column does not exist in the data frame.", type = "error")}})}
+        ggplotly(barp)}})}
     
 
 shinyApp(ui = ui, server = server)
