@@ -273,6 +273,11 @@ server = function(input, output, session) {
         fdt <- filtered_dt()
         req(fdt)
         
+        if (input$dvt == "--No Selection") {
+            return(NULL)}
+        else if (input$plot_view == "No") {
+            return(NULL)}
+        
         gtheme <- theme_minimal() +
             theme(panel.grid = element_line(color = "black", linewidth = .5)) +
             theme(axis.text.x = element_text(size = 15, angle = 45, hjust = 1, face = "bold", color = "black",
