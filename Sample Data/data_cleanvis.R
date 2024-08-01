@@ -210,8 +210,7 @@ server = function(input, output, session) {
                 selectInput("fill", "Fill Variables?", choices = c("Yes", "No"), selected = "No"),
                 uiOutput("fill_v"),
                 
-                radioButtons("plot_type", "", choices = ""),
-                checkboxInput("vhide", "Hide Visualization?"))}})
+                radioButtons("plot_type", "", choices = ""))}})
     
     output$fill_v <- renderUI({
         req(input$fill)
@@ -252,7 +251,7 @@ server = function(input, output, session) {
         
         if (input$plot_type %in% c("Density")) {
             show("fill")
-            hide("x_value")}
+            hide("y_value")}
         else if (input$plot_type == "Line") {
             hide("fill")}
         else {
@@ -314,7 +313,7 @@ server = function(input, output, session) {
         
         else if (input$plot_type == "Bar") {
             barp <- ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), fill = !!sym(input$x_value))) +
-                geom_bar(stat = "identity") +
+                geom_bar(stat = "identity", position = "dodge", linewidth = 1, color = "black") +
                 labs(title = paste0("Bar Plot of ", input$x_value, " Over ", input$y_value), x = input$x_value, y = input$y_value) +
                 gtheme
             ggplotly(barp)}
