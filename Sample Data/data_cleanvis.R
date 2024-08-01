@@ -17,7 +17,7 @@ ui <- fluidPage(
     
     sidebarLayout(
         sidebarPanel(
-            fileInput("file", "Import your file (CSV, JSON, XML, XLSX, ODS):"),
+            fileInput("file", HTML("Import your file:<br>(CSV, JSON, XML, XLSX, ODS)")),
             uiOutput("file_sidebar"),
             uiOutput("download")),
         mainPanel(
