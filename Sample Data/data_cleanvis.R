@@ -193,7 +193,7 @@ server = function(input, output, session) {
         
         if (input$plot_view == "Yes") {
             tagList(
-                selectInput("dvt", "Data Visualization Type?", choices = c("--No Selection", "Numerical", "Categorical")),
+                selectInput("dvt", "Data Visualization Type?", choices = c("--No Selection", "Plot Variation")),
                 uiOutput("dvtui"))}
         else if (input$plot_view == "No") {
             return(NULL)}})
@@ -207,22 +207,22 @@ server = function(input, output, session) {
             tagList(
                 selectInput("x_value", "X Value:", choices = colnames(fdt)),
                 selectInput("y_value", "Y Value:", choices = colnames(fdt)),
-                selectInput("groupby", "Grouped Variables?", choices = c("Yes", "No"), selected = "No"),
-                uiOutput("group_v"),
+                selectInput("fill", "Fill Variables?", choices = c("Yes", "No"), selected = "No"),
+                uiOutput("fill_v"),
                 
                 radioButtons("plot_type", "", choices = ""),
                 checkboxInput("vhide", "Hide Visualization?"))}})
     
-    output$group_v <- renderUI({
-        req(input$groupby)
+    output$fill_v <- renderUI({
+        req(input$fill)
         req(filtered_dt)
         fdt <- filtered_dt()
         req(fdt)
         
         if (input$y_value %in% colnames(fdt)) {
             
-            if (input$groupby == "Yes") {
-                selectInput("grouper", "Columns to Group:", choices = colnames(fdt))}
+            if (input$fill == "Yes") {
+                selectInput("filler", "Column to fill:", choices = colnames(fdt))}
             else {
                 NULL}}})
     
@@ -240,11 +240,8 @@ server = function(input, output, session) {
     observeEvent(input$dvt, {
         req(input$dvt)
         
-        if (input$dvt == "Numerical") {
-            updateRadioButtons(session, "plot_type", "Plot Type:", choices = c("Box", "Scatter", "Histogram", "Line"))
-            show("plot_type")}
-        else if (input$dvt == "Categorical") {
-            updateRadioButtons(session, "plot_type", choices = c("Bar", "Pie", "Density"))
+        if (input$dvt == "Plot Variation") {
+            updateRadioButtons(session, "plot_type", "Plot Type:", choices = c("Bar", "Box", "Scatter", "Line", "Density"))
             show("plot_type")}
         else {
             hide("plot_type")}})
@@ -253,16 +250,14 @@ server = function(input, output, session) {
         req(input$dvt)
         req(input$plot_type)
         
-        if (input$plot_type %in% c("Histogram", "Pie", "Density")) {
-            show("groupby")
+        if (input$plot_type %in% c("Density")) {
+            show("fill")
             hide("x_value")}
-        else if (input$plot_type == "Histogram") {
-            hide("y_value")}
         else if (input$plot_type == "Line") {
-            hide("groupby")}
+            hide("fill")}
         else {
-            hide("groupby")
-            hide("grouper")
+            hide("fill")
+            hide("filler")
             show("y_value")
             show("x_value")}})
     
@@ -272,11 +267,17 @@ server = function(input, output, session) {
         req(filtered_dt)
         fdt <- filtered_dt()
         req(fdt)
+        req(input$x_value %in% colnames(fdt))
+        req(input$y_value %in% colnames(fdt))
         
         if (input$dvt == "--No Selection") {
-            return(NULL)}
-        else if (input$plot_view == "No") {
-            return(NULL)}
+            return(NULL)
+        } else if (input$plot_view == "No") {
+            return(NULL)
+        }
+        
+        fdt <- filtered_dt()
+        req(nrow(fdt) > 0)
         
         gtheme <- theme_minimal() +
             theme(panel.grid = element_line(color = "black", linewidth = .5)) +
@@ -287,28 +288,8 @@ server = function(input, output, session) {
                   plot.title = element_text(size = 25),
                   axis.title = element_text(size = 20),
                   legend.text = element_text(size = 15),
-                  legend.title = element_text(size = 18, 
-                                              margin = margin(b = 10)))
+                  legend.title = element_text(size = 18, margin = margin(b = 10)))
         
-        if (input$plot_type %in% c("Histogram", "Pie")) {
-            if (input$groupby == "Yes" && input$grouper %in% colnames(fdt)) {
-                fdt <- fdt %>%
-                    group_by(!!sym(input$grouper)) %>%
-                    count(!!sym(input$y_value)) %>%
-                    group_by(!!sym(input$grouper)) %>%
-                    mutate(percentage = n / sum(n) * 100) %>%
-                    ungroup()
-                
-                print(fdt)}}
-        
-        else if (input$groupby == "No") {
-            fdt <- fdt %>%
-                count(!!sym(input$y_value)) %>%
-                mutate(percentage = n / sum(n) * 100)
-            
-            print(fdt)}
-        
-        print(fdt)
         
         if (input$plot_type == "Box") {
             boxp <- ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), fill = !!sym(input$x_value))) +
@@ -324,22 +305,8 @@ server = function(input, output, session) {
                 gtheme
             ggplotly(scatp)}
         
-        else if (input$plot_type == "Histogram") {
-            if (input$groupby == "Yes" && input$grouper %in% colnames(fdt)) {
-                histp <- ggplot(fdt, aes(x = !!sym(input$x_value))) +
-                    geom_bar(fill = "darkblue", color = "black", alpha = .8) +
-                    labs(title = paste0("Histogram of ", input$x_value), x = input$x_value, y = paste0("Count of ", input$grouper)) +
-                    gtheme
-                ggplotly(histp)}
-            else if (input$groupby == "No") {
-                histp <- ggplot(fdt, aes(x = !!sym(input$x_value))) +
-                    geom_bar(fill = "darkblue", color = "black", alpha = .8) +
-                    labs(title = paste0("Histogram of ", input$x_value), x = input$x_value, y = "Count") +
-                    gtheme
-                ggplotly(histp)}}
-        
         else if (input$plot_type == "Line") {
-            linep <- ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), color = !!sym(input$y_value))) +
+            linep <- ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), color = !!sym(input$x_value))) +
                 geom_line(linewidth = 5) +
                 labs(title = paste0("Line Plot of ", input$x_value, " Over ", input$y_value), x = input$x_value, y = input$y_value) +
                 gtheme
@@ -347,10 +314,23 @@ server = function(input, output, session) {
         
         else if (input$plot_type == "Bar") {
             barp <- ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), fill = !!sym(input$x_value))) +
-                geom_bar(stat = "identity", position = "dodge", linewidth = .5, color = "black", alpha = .8) +
+                geom_bar(stat = "identity") +
                 labs(title = paste0("Bar Plot of ", input$x_value, " Over ", input$y_value), x = input$x_value, y = input$y_value) +
                 gtheme
-            ggplotly(barp)}})}
-    
+            ggplotly(barp)}
+        
+        else if (input$plot_type == "Density") {
+            if (input$fill == "Yes" && !is.null(input$filler)) {
+                densp <- ggplot(fdt, aes(x = !!sym(input$x_value), fill = !!sym(input$filler))) +
+                    geom_density(alpha = 0.5) +
+                    labs(title = paste0("Density Plot of ", input$x_value, " By ", input$filler), x = input$x_value) +
+                    gtheme}
+            else {
+                densp <- ggplot(fdt, aes(x = !!sym(input$x_value))) +
+                    geom_density(aes(fill = !!sym(input$x_value)), alpha = 0.5) +
+                    labs(title = paste0("Density Plot of ", input$x_value), x = input$x_value) +
+                    gtheme}
+            ggplotly(densp)}})}
+
 
 shinyApp(ui = ui, server = server)
