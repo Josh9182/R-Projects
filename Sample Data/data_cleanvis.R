@@ -265,36 +265,36 @@ server = function(input, output, session) {
             hide("grouper")
             show("y_value")
             show("x_value")}})
-
-output$plot <- renderPlotly({
-    req(input$plot_view)
-    req(input$plot_type)
-    req(filtered_dt)
-    fdt <- filtered_dt()
-    req(fdt)
     
-    gtheme <- theme_minimal() +
-        theme(panel.grid = element_line(color = "black", linewidth = .5)) +
-        theme(axis.text.x = element_text(size = 15, angle = 45, hjust = 1, face = "bold", color = "black",
-                                         margin = margin(b = 10)), 
-              axis.text.y = element_text(size = 15, angle = 45, hjust = 1, face = "bold", color = "black",  
-                                         margin = margin(r = 10)),
-              plot.title = element_text(size = 25),
-              axis.title = element_text(size = 20),
-              legend.text = element_text(size = 15),
-              legend.title = element_text(size = 18, 
-                                          margin = margin(b = 10)))
-    
-    if (input$plot_type %in% c("Histogram", "Pie")) {
-        if (input$groupby == "Yes" && input$grouper %in% colnames(fdt)) {
-            fdt <- fdt %>%
-                group_by(!!sym(input$grouper)) %>%
-                count(!!sym(input$y_value)) %>%
-                group_by(!!sym(input$grouper)) %>%
-                mutate(percentage = n / sum(n) * 100) %>%
-                ungroup()
-            
-            print(fdt)}}
+    output$plot <- renderPlotly({
+        req(input$plot_view)
+        req(input$plot_type)
+        req(filtered_dt)
+        fdt <- filtered_dt()
+        req(fdt)
+        
+        gtheme <- theme_minimal() +
+            theme(panel.grid = element_line(color = "black", linewidth = .5)) +
+            theme(axis.text.x = element_text(size = 15, angle = 45, hjust = 1, face = "bold", color = "black",
+                                             margin = margin(b = 10)), 
+                  axis.text.y = element_text(size = 15, angle = 45, hjust = 1, face = "bold", color = "black",  
+                                             margin = margin(r = 10)),
+                  plot.title = element_text(size = 25),
+                  axis.title = element_text(size = 20),
+                  legend.text = element_text(size = 15),
+                  legend.title = element_text(size = 18, 
+                                              margin = margin(b = 10)))
+        
+        if (input$plot_type %in% c("Histogram", "Pie")) {
+            if (input$groupby == "Yes" && input$grouper %in% colnames(fdt)) {
+                fdt <- fdt %>%
+                    group_by(!!sym(input$grouper)) %>%
+                    count(!!sym(input$y_value)) %>%
+                    group_by(!!sym(input$grouper)) %>%
+                    mutate(percentage = n / sum(n) * 100) %>%
+                    ungroup()
+                
+                print(fdt)}}
         
         else if (input$groupby == "No") {
             fdt <- fdt %>%
@@ -303,49 +303,49 @@ output$plot <- renderPlotly({
             
             print(fdt)}
         
-    print(fdt)
-    
-    if (input$plot_type == "Box") {
-        boxp <- ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), fill = !!sym(input$x_value))) +
+        print(fdt)
+        
+        if (input$plot_type == "Box") {
+            boxp <- ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), fill = !!sym(input$x_value))) +
                 geom_boxplot(size = 1) +
                 labs(title = paste0("Box Plot of ", input$x_value, " By ", input$y_value), x = input$x_value, y = input$y_value) + 
                 gtheme
-        ggplotly(boxp)}
-    
-    else if (input$plot_type == "Scatter") {
-        scatp <- ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), color = !!sym(input$x_value))) +
+            ggplotly(boxp)}
+        
+        else if (input$plot_type == "Scatter") {
+            scatp <- ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), color = !!sym(input$x_value))) +
                 geom_point(size = 4, alpha = .6) +
                 labs(title = paste0("Scatter Plot of ", input$x_value, " By ", input$y_value), x = input$x_value, y = input$y_value) + 
                 gtheme
-        ggplotly(scatp)}
-    
-    else if (input$plot_type == "Histogram") {
-        if (input$groupby == "Yes" && input$grouper %in% colnames(fdt)) {
-            histp <- ggplot(fdt, aes(x = !!sym(input$x_value))) +
+            ggplotly(scatp)}
+        
+        else if (input$plot_type == "Histogram") {
+            if (input$groupby == "Yes" && input$grouper %in% colnames(fdt)) {
+                histp <- ggplot(fdt, aes(x = !!sym(input$x_value))) +
                     geom_bar(fill = "darkblue", color = "black", alpha = .8) +
                     labs(title = paste0("Histogram of ", input$x_value), x = input$x_value, y = paste0("Count of ", input$grouper)) +
                     gtheme
-            ggplotly(histp)}
-        else if (input$groupby == "No") {
-            histp <- ggplot(fdt, aes(x = !!sym(input$x_value))) +
-                geom_bar(fill = "darkblue", color = "black", alpha = .8) +
-                labs(title = paste0("Histogram of ", input$x_value), x = input$x_value, y = "Count") +
-                gtheme
-            ggplotly(histp)}}
-    
-    else if (input$plot_type == "Line") {
-        linep <- ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), color = !!sym(input$y_value))) +
+                ggplotly(histp)}
+            else if (input$groupby == "No") {
+                histp <- ggplot(fdt, aes(x = !!sym(input$x_value))) +
+                    geom_bar(fill = "darkblue", color = "black", alpha = .8) +
+                    labs(title = paste0("Histogram of ", input$x_value), x = input$x_value, y = "Count") +
+                    gtheme
+                ggplotly(histp)}}
+        
+        else if (input$plot_type == "Line") {
+            linep <- ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), color = !!sym(input$y_value))) +
                 geom_line(linewidth = 5) +
                 labs(title = paste0("Line Plot of ", input$x_value, " Over ", input$y_value), x = input$x_value, y = input$y_value) +
                 gtheme
-        ggplotly(linep)}
-    
-    else if (input$plot_type == "Bar") {
-        barp <- ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), fill = !!sym(input$x_value))) +
+            ggplotly(linep)}
+        
+        else if (input$plot_type == "Bar") {
+            barp <- ggplot(fdt, aes(x = !!sym(input$x_value), y = !!sym(input$y_value), fill = !!sym(input$x_value))) +
                 geom_bar(stat = "identity", position = "dodge", linewidth = .5, color = "black", alpha = .8) +
                 labs(title = paste0("Bar Plot of ", input$x_value, " Over ", input$y_value), x = input$x_value, y = input$y_value) +
                 gtheme
-        ggplotly(barp)}})}
+            ggplotly(barp)}})}
     
 
 shinyApp(ui = ui, server = server)
