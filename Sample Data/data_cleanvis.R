@@ -191,19 +191,10 @@ server = function(input, output, session) {
         req(filtered_dt)
         fdt <- filtered_dt()
         
-        if (input$plot_view == "Yes") {
-            tagList(
-                selectInput("dvt", "Data Visualization Type?", choices = c("--No Selection", "Plot Variation")),
-                uiOutput("dvtui"))}
-        else if (input$plot_view == "No") {
-            return(NULL)}})
-    
-    output$dvtui <- renderUI({
-        req(input$dvt)
-        req(filtered_dt)
-        fdt <- filtered_dt()
+        if (input$plot_view == "No") {
+            return(NULL)}
         
-        if (input$dvt != "--No Selection") {
+        else if (input$plot_view == "Yes") {
             tagList(
                 selectInput("x_value", "X Value:", choices = colnames(fdt)),
                 selectInput("y_value", "Y Value:", choices = colnames(fdt)),
@@ -236,17 +227,16 @@ server = function(input, output, session) {
         else {
             NULL}})
     
-    observeEvent(input$dvt, {
-        req(input$dvt)
+    observeEvent(input$plot_view, {
+        req(input$plot_view)
         
-        if (input$dvt == "Plot Variation") {
+        if (input$plot_view == "Yes") {
             updateRadioButtons(session, "plot_type", "Plot Type:", choices = c("Bar", "Box", "Scatter", "Line", "Density"))
             show("plot_type")}
         else {
             hide("plot_type")}})
     
     observeEvent(input$plot_type, {
-        req(input$dvt)
         req(input$plot_type)
         
         if (input$plot_type %in% c("Density")) {
@@ -269,11 +259,8 @@ server = function(input, output, session) {
         req(input$x_value %in% colnames(fdt))
         req(input$y_value %in% colnames(fdt))
         
-        if (input$dvt == "--No Selection") {
-            return(NULL)
-        } else if (input$plot_view == "No") {
-            return(NULL)
-        }
+        if (input$plot_view == "No") {
+            return(NULL)}
         
         fdt <- filtered_dt()
         req(nrow(fdt) > 0)
@@ -329,7 +316,20 @@ server = function(input, output, session) {
                     geom_density(aes(fill = !!sym(input$x_value)), alpha = 0.5) +
                     labs(title = paste0("Density Plot of ", input$x_value), x = input$x_value) +
                     gtheme}
-            ggplotly(densp)}})}
-
+            ggplotly(densp)}})
+    
+    output$download_file <- downloadHandler(
+        filename = function() {
+            file_ext <- file_ext(input$file$name)
+            paste0("cleaned_data.", file_ext)}, 
+        
+        content = function(file) {
+            switch(file_ext, 
+                     csv = write_csv(fdt, file), 
+                     json = write_json(fdt, file), 
+                     xml = write_xml(fdt, file), 
+                     xlsx = write_xlsx(fdt, file), 
+                     ods = write_ods(fdt, file), 
+                     stop("Unsupported file type, please retry."))})}
 
 shinyApp(ui = ui, server = server)
