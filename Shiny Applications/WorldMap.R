@@ -15,8 +15,12 @@ ui <- fluidPage(
             leafletOutput("leaf", height = "900px", width = "1200px"))))
 
 server <- function(input, output) {
-    output$leaf <- renderLeaflet({
-        leaflet() %>%
-            addTiles()})}
+    output$view_sidebar <- renderUI({
+        req(input$view_type)
+        
+        if (input$view_type != "--No Selection" && input$view_type == "Specific Location") {
+            tagList(
+               textInput("location", "Location:"))}
+    })}
 
 shinyApp(ui, server)
