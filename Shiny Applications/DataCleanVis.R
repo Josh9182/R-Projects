@@ -22,7 +22,6 @@ ui <- fluidPage(
             uiOutput("file_sidebar"),
             uiOutput("download")),
         mainPanel(
-            uiOutput("uio"),
             DTOutput("table"),
             plotlyOutput("plot", height = 800, width = 1200))))
 
