@@ -33,6 +33,15 @@ server <- function(input, output) {
                 addTiles() %>%
                 setView(lng = 43.66253690456744, lat = -10.029940624081375, zoom = 10)}
         else if (input$view_type != "--No Selection" && input$location != "") {
+            location <- input$location
+            
+            location_result <- geocode_OSM(location)
+            
+            if (!is.null(location_result$coords)) {
+                leafletProxy("map") %>%
+                    setView(lng = location_result$coords[1], lat = location_result$coords[2], zoom = 5)
+            }
+            
             
         }
     })
