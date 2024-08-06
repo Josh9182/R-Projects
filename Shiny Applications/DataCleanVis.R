@@ -11,6 +11,7 @@ library(shinyjs)
 library(ggplot2)
 library(plotly)
 
+# Dynamic UI with fluid resizable page and file input. 
 ui <- fluidPage(
     useShinyjs(), 
     titlePanel("Data Cleaner & Visualizer"),
@@ -26,7 +27,7 @@ ui <- fluidPage(
             plotlyOutput("plot", height = 800, width = 1200))))
 
 server = function(input, output, session) {
-    data <- reactive({
+    data <- reactive({ # Reactive variable, creates a DataFrame based off of file input.
         req(input$file)
         
         file_ext <- file_ext(input$file$datapath)
@@ -40,7 +41,7 @@ server = function(input, output, session) {
                      stop("Unsupported file type, please retry."))
         print(fp)})
     
-    output$file_sidebar <- renderUI({
+    output$file_sidebar <- renderUI({ # Dynamic UI change based off of file input
         req(input$file)
         
         if (!is.null(input$file)) {
@@ -51,7 +52,7 @@ server = function(input, output, session) {
                 selectInput("plot_view", "Plot Customization:", choices = c("Yes", "No"), selected = "No"),
                 uiOutput("pv_dyn"))}})
     
-    output$tb_dyn <- renderUI({
+    output$tb_dyn <- renderUI({ # Dynamic UI change with several buttons based off of Table View Button
         req(input$table_view)
         
         if (input$table_view == "Yes") {
@@ -73,7 +74,7 @@ server = function(input, output, session) {
         else {
             NULL}})
     
-    output$case_choice <- renderUI({
+    output$case_choice <- renderUI({ # Case change button creation
         req(input$case)
         
         if (input$case == "Yes") {
@@ -82,7 +83,7 @@ server = function(input, output, session) {
         else {
             NULL}})
     
-    output$col_choice <- renderUI({
+    output$col_choice <- renderUI({ # Column selector button creation 
         req(input$cols)
         
         if (input$cols == "Yes") {
@@ -91,14 +92,14 @@ server = function(input, output, session) {
         else {
             NULL}})
     
-    output$row_choice <- renderUI({
+    output$row_choice <- renderUI({ # Row selector slider creation
         req(input$rows)
         
         if (input$rows == "Yes") {
             tagList(
                 sliderInput("row_selector", "Rows to Remove:", min = 0, max = nrow(data()), value = 0, step = 1))}})
     
-    filtered_dt <- reactive({
+    filtered_dt <- reactive({ # Reactive if/else if to add functions to each input
         req(data)
         fdt <- data()
         
@@ -143,7 +144,7 @@ server = function(input, output, session) {
         else {
             data.frame()}})
     
-    output$table <- renderDT({
+    output$table <- renderDT({ # Table output based off of if/else if changes
         req(input$table_view == "Yes") 
         fdt <- filtered_dt()
         req(fdt)
@@ -152,7 +153,7 @@ server = function(input, output, session) {
             return(NULL)}
         datatable(fdt)})
     
-    observeEvent(input$table_view, {
+    observeEvent(input$table_view, { # Table output visual change based off of "table_view" input
         if (input$table_view == "No") {
             output$table <- renderDT({NULL})}
         else if (input$table_view == "Yes") {
@@ -160,7 +161,7 @@ server = function(input, output, session) {
                 fdt <- filtered_dt()
                 datatable(fdt)})}})
     
-    observeEvent(input$hide, {
+    observeEvent(input$hide, { # Hide button functionality
         if (input$hide) {
             output$table <- renderDT({NULL})
             hide("white")
@@ -186,7 +187,7 @@ server = function(input, output, session) {
                 show("row_choice")
                 datatable(fdt)})}})
     
-    output$pv_dyn <- renderUI({
+    output$pv_dyn <- renderUI({ # UI change based off "plot_view" input
         req(input$plot_view)
         req(filtered_dt)
         fdt <- filtered_dt()
@@ -203,7 +204,7 @@ server = function(input, output, session) {
                 
                 radioButtons("plot_type", "", choices = ""))}})
     
-    output$fill_v <- renderUI({
+    output$fill_v <- renderUI({ # Fill column(s) input creation
         req(input$fill)
         req(filtered_dt)
         fdt <- filtered_dt()
@@ -216,7 +217,7 @@ server = function(input, output, session) {
             else {
                 NULL}}})
     
-    output$download <- renderUI({
+    output$download <- renderUI({ # Down
         req(input$table_view)
         req(input$plot_view)
         
