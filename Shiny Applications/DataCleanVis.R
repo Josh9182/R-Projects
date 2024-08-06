@@ -217,7 +217,7 @@ server = function(input, output, session) {
             else {
                 NULL}}})
     
-    output$download <- renderUI({ # Down
+    output$download <- renderUI({ # File download button creation
         req(input$table_view)
         req(input$plot_view)
         
@@ -228,7 +228,7 @@ server = function(input, output, session) {
         else {
             NULL}})
     
-    observeEvent(input$plot_view, {
+    observeEvent(input$plot_view, { # Plot type choices update update based off of "plot_view" input
         req(input$plot_view)
         
         if (input$plot_view == "Yes") {
@@ -237,7 +237,7 @@ server = function(input, output, session) {
         else {
             hide("plot_type")}})
     
-    observeEvent(input$plot_type, {
+    observeEvent(input$plot_type, { # Plot button changes due to differing plot element needs
         req(input$plot_type)
         
         if (input$plot_type %in% c("Density")) {
@@ -251,7 +251,7 @@ server = function(input, output, session) {
             show("y_value")
             show("x_value")}})
     
-    output$plot <- renderPlotly({
+    output$plot <- renderPlotly({ # If/else if giving plot render function to each plot type
         req(input$plot_view)
         req(input$plot_type)
         req(filtered_dt)
@@ -319,7 +319,7 @@ server = function(input, output, session) {
                     gtheme}
             ggplotly(densp)}})
     
-    output$download_file <- downloadHandler(
+    output$download_file <- downloadHandler( # Giving download button functionality
         filename = function() {
             file_ext <- file_ext(input$file$name)
             paste0("cleaned_data.", file_ext)}, 
