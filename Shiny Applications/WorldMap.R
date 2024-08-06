@@ -31,7 +31,7 @@ server <- function(input, output) {
         else if (input$view_type != "--No Selection" && input$view_type == "Worldwide") {
             leaflet() %>%
                 addTiles() %>%
-                setView(lng = 43.66253690456744, lat = -10.029940624081375, zoom = 10)}
+                setView(lng = 43.66253690456744, lat = -10.029940624081375, zoom = 1)}
         else if (input$view_type != "--No Selection" && input$location != "") {
             location <- input$location
             
