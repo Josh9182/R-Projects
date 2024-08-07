@@ -41,5 +41,16 @@ server <- function(input, output, session) {
         else {
             NULL}})
     
+    observe({
+        req(input$cols)
+        req(input$rows)
+        req(input$gradient)
+        
+        if (length(input$cols) > 2) {
+            updateSelectInput(session, "cols", selected = input$cols[1:2])}
+        else if (length(input$gradient > 2)) {
+            updateSelectInput(session, "gradient", selected = input$gradient[1:2])}
+    })
+    
     
 }
