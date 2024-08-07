@@ -11,3 +11,22 @@ ui <- fluidPage(
             
         mainPanel(
             plotlyOutput("heatmap"))))
+
+server <- function(input, output, session) {
+    data <- reactive({
+        req(input$file)
+        
+        file_ext <- file_ext(input$file$datapath)
+        
+        fe <- switch(file_ext, 
+                     csv = read_csv(input$file$datapath), 
+                     json = fromJSON(input$file$datapath), 
+                     xml = read_xml(input$file$datapath), 
+                     xlsx = read_xlsx(input$file$datapath), 
+                     ods = read_ods(input$file$datapath), 
+                     stop("Unsupported file type, please retry."))
+        
+        print(fe)})
+    
+    
+}
