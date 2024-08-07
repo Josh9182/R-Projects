@@ -28,5 +28,18 @@ server <- function(input, output, session) {
         
         print(fe)})
     
+    output$file_sidebar <- renderUI({
+        req(input$file)
+        
+        if (!is.null(input$file)) {
+            tagList(
+                selectInput("cols", "Select Columns:", choices = colnames(data()), multiple = TRUE),
+                
+                sliderInput("rows", "Select Row Amount:", min = 0, max = nrow(data()), value = 0, step = 1),
+                
+                selectInput("gradient", "Colors for gradient:", choices = c("Blue", "Purple", "Green", "Yellow", "Orange", "Red"), multiple = TRUE))}
+        else {
+            NULL}})
+    
     
 }
