@@ -16,7 +16,7 @@ server <- function(input, output, session) {
     data <- reactive({
         req(input$file)
         
-        file_ext <- tools::file_ext(input$file$datapath)
+        file_ext <- file_ext(input$file$datapath)
         
         fe <- switch(file_ext, 
                      csv = read_csv(input$file$datapath), 
