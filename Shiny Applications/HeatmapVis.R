@@ -26,12 +26,11 @@ server <- function(input, output, session) {
                      ods = readODS::read_ods(input$file$datapath), 
                      stop("Unsupported file type, please retry."))
         
-        fe
-    })
+        print(fe)})
     
     output$file_sidebar <- renderUI({
         req(input$file)
-        req(data())
+        req(data)
         
         numeric_cols <- colnames(data())[sapply(data(), is.numeric)]
         
@@ -40,31 +39,25 @@ server <- function(input, output, session) {
             sliderInput("rows", "Select Row Amount:", min = 1, max = nrow(data()), value = nrow(data()), step = 1),
             selectInput("gradient", "Colors for gradient:", 
                         choices = c("Blue", "Purple", "Green", "Yellow", "Orange", "Red"), 
-                        multiple = TRUE)
-        )
-    })
+                        multiple = TRUE))})
     
     observe({
-        req(data())
+        req(data)
         req(input$cols)
         
         numeric_cols <- colnames(data())[sapply(data(), is.numeric)]
         
-        updateSelectInput(session, "cols", choices = numeric_cols, selected = input$cols)
-    })
+        updateSelectInput(session, "cols", choices = numeric_cols, selected = input$cols)})
     
     observe({
         req(input$cols)
         req(input$gradient)
         
         if (length(input$cols) > 2) {
-            updateSelectInput(session, "cols", selected = input$cols[1:2])
-        }
+            updateSelectInput(session, "cols", selected = input$cols[1:2])}
         
         if (length(input$gradient) > 2) {
-            updateSelectInput(session, "gradient", selected = input$gradient[1:2])
-        }
-    })
+            updateSelectInput(session, "gradient", selected = input$gradient[1:2])}})
     
     output$heatmap <- renderPlotly({
         req(input$cols)
