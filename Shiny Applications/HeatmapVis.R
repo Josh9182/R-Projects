@@ -1,3 +1,14 @@
+library(readODS)
+library(readxl)
+library(jsonlite)
+library(xml2)
+library(tools)
+library(tidyverse)
+library(shiny)
+library(shinyjs)
+library(heatmaply)
+library(plotly)
+
 ui <- fluidPage(
     titlePanel("Heat Map Visualizer"), 
     
@@ -41,13 +52,12 @@ server <- function(input, output, session) {
                         choices = c("Blue", "Purple", "Green", "Yellow", "Orange", "Red"), 
                         multiple = TRUE))})
     
-    observe({
-        req(data)
-        req(input$cols)
+    observeEvent(input$cols, {
         
-        numeric_cols <- colnames(data())[sapply(data(), is.numeric)]
-        
-        updateSelectInput(session, "cols", choices = numeric_cols, selected = input$cols)})
+        if (!is.null(input$cols)) {
+            numeric_cols <- colnames(data())[sapply(data(), is.numeric)]
+            
+            updateSelectInput(session, "cols", choices = numeric_cols, selected = input$cols)}})
     
     observe({
         req(input$cols)
