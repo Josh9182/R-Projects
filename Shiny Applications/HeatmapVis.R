@@ -21,9 +21,9 @@ server <- function(input, output, session) {
         fe <- switch(file_ext, 
                      csv = read_csv(input$file$datapath), 
                      json = fromJSON(input$file$datapath), 
-                     xml = xml2::read_xml(input$file$datapath), 
-                     xlsx = readxl::read_xlsx(input$file$datapath), 
-                     ods = readODS::read_ods(input$file$datapath), 
+                     xml = read_xml(input$file$datapath), 
+                     xlsx = read_xlsx(input$file$datapath), 
+                     ods = read_ods(input$file$datapath), 
                      stop("Unsupported file type, please retry."))
         
         print(fe)})
