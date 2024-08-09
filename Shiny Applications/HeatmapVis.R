@@ -43,8 +43,6 @@ server <- function(input, output, session) {
         req(input$file)
         req(data)
         
-        numeric_cols <- colnames(data())[sapply(data(), is.numeric)]
-        
         tagList(
             selectInput("cols", "Select Columns:", choices = numeric_cols, multiple = TRUE),
             sliderInput("rows", "Select Row Amount:", min = 1, max = nrow(data()), value = nrow(data()), step = 1),
