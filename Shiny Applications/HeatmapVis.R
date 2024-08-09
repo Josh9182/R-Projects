@@ -44,7 +44,7 @@ server <- function(input, output, session) {
         req(data)
         
         tagList(
-            selectInput("cols", "Select Columns:", choices = numeric_cols, multiple = TRUE),
+            selectInput("cols", "Select Columns:", choices = colnames(data()), multiple = TRUE),
             sliderInput("rows", "Select Row Amount:", min = 1, max = nrow(data()), value = nrow(data()), step = 1),
             selectInput("gradient", "Colors for gradient:", 
                         choices = c("Blue", "Purple", "Green", "Yellow", "Orange", "Red"), 
