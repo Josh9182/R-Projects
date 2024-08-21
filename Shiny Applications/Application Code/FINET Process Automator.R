@@ -35,6 +35,17 @@ server <- function(input, output, session) {
                      stop("Unsupported file type, please retry."))
         return(fp)})
     
+    filtered_data <- reactive({
+        req(data)
+        fdt <- data()
+        
+        if(!is.null(fdt) && nrow(fdt) > 0) {
+            fdt <- fdt %>%
+                distinct() %>%
+                mutate(across(where(is.character), ~ str_trim(.)))
+            
+        data.frame(fdt)}})
+    
     output$file_sidebar <- renderUI({
         req(input$file)
         
@@ -43,10 +54,23 @@ server <- function(input, output, session) {
                 selectInput("table_view", "Table Customization:", choices = c("Yes", "No"), selected = "No"), 
                 uiOutput("tb_dyn"),
                 
-                actionButton("cancel_button", "Begin Cancellation Process"))}})
+                actionButton("cancel_button", "Begin Cancellation Process"))}
+        else {
+            stop("Unable to render, please do not import empty file.")}})
+    
+    output$tb_dyn <- renderUI({
+        req(input$table_view)
+        req(filtered_data)
+        fdt <- filtered_data()
+        
+        
+        if (input$table_view == "Yes") {
+            tagList(
+                selectInput("cols", "Select Columns:", choices = colnames(fdt), multiple = TRUE), 
+                sliderInput("rows", "Select Rows:", min = 0, max = nrow(fdt), value = c(0,nrow(fdt)), step = 1))}})
     
     output$table <- renderDT({
-        fdt <- data()
+        fdt <- filtered_data()
         req(fdt)
         
         if (nrow(fdt) == 0) {
