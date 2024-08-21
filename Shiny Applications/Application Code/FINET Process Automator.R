@@ -66,11 +66,26 @@ server <- function(input, output, session) {
         
         if (input$table_view == "Yes") {
             tagList(
-                selectInput("cols", "Select Columns:", choices = colnames(fdt), multiple = TRUE), 
+                selectInput("cols", "Remove Columns:", choices = colnames(fdt), multiple = TRUE), 
                 sliderInput("rows", "Select Rows:", min = 0, max = nrow(fdt), value = c(0,nrow(fdt)), step = 1))}})
     
-    output$table <- renderDT({
+    filtered_dt <- reactive({
+        req(filtered_data)
         fdt <- filtered_data()
+        
+        if (!is.null(fdt) && nrow(fdt) > 0) {
+            if (!is.null(input$cols)) {
+                fdt <- fdt %>%
+                    select(-all_of(input$cols))}
+            
+            if (!is.null(input$rows)) {
+                fdt <- fdt %>%
+                    slice(input$rows[1]:input$rows[2])}  
+
+        data.frame(fdt)}})
+    
+    output$table <- renderDT({
+        fdt <- filtered_dt()
         req(fdt)
         
         if (nrow(fdt) == 0) {
