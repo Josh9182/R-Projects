@@ -15,7 +15,8 @@ ui <- fluidPage(
     
     sidebarLayout(
         sidebarPanel(
-            fileInput("file", "Import your file:")),
+            fileInput("file", "Import your file:"), 
+            uiOutput("file_sidebar")),
         mainPanel(
             DTOutput("table"))))
 
@@ -33,8 +34,16 @@ server <- function(input, output, session) {
                      ods = read_ods(input$file$datapath), 
                      stop("Unsupported file type, please retry."))
         return(fp)})
-
-shinyApp(ui, server)
+    
+    output$file_sidebar <- renderUI({
+        req(input$file)
+        
+        if(!is.null(input$file)) {
+            tagList(
+                selectInput("table_view", "Table Customization:", choices = c("Yes", "No"), selected = "No"), 
+                uiOutput("tb_dyn"),
+                
+                actionButton("cancel_button", "Begin Cancellation Process"))}})
     
     output$table <- renderDT({
         fdt <- data()
