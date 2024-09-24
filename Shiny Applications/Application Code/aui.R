@@ -199,7 +199,7 @@ server <- function(input, output, session) {
         start_date <- as.character(input$date[1])
         end_date <- as.character(input$date[2])
         
-        system2("python", args = c("C:/Users/joshlewis/Downloads/ShinyApp/file_sort.py", start_dir, end_dir, start_date, end_date), stdout = TRUE, stderr = TRUE)
+        system2("python", args = c("file_sort.py", start_dir, end_dir, start_date, end_date), stdout = TRUE, stderr = TRUE)
         
         showNotification("Files Have Been Rearranged!", type = "message")})}
 
