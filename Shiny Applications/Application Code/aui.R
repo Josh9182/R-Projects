@@ -27,31 +27,18 @@ ui <- fluidPage(
         border-radius: 10px;
         box-shadow: 0px 0px 10px lightgray;
     }
-
-    .title {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        width: 400px;
-        height: 100px;
-        margin-right: 20px;
-        font-size: 80px;
-        font-family: fantasy;
-        color: black;
-
-    }
     
     .title_ex {
         display: flex;
         align-items: center;
         justify-content: center;
         flex-direction: column;
-        width: 800px;
-        height: 100px;
+        font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        width: 900px;
+        height: 70px;
+        margin-bottom: 20px;
         margin-right: 20px;
-        font-size: 30px;
-        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        font-size: 50px;
         color: black;
 
     }
@@ -121,11 +108,12 @@ ui <- fluidPage(
     
     .shiny-notification {
         position: fixed;
-        top: 35.8%;
+        top: 31.5%;
         left: 48.6%;
         transform: translate(-50%, -50%);
         width: 800px;
-        font-size: 14px;
+        height: 65px;
+        font-size: 20px;
         font-weight: bold;
         padding: 12px;
         color: black;
@@ -149,8 +137,6 @@ ui <- fluidPage(
     ")),
     
     div(class = "custom-container",
-        div(class = "title", 
-            "AFSS"),
         div(class = "title_ex", "Automated File Sorting Software"),
         sidebarLayout(
             sidebarPanel(
