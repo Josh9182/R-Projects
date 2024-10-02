@@ -1,2 +1,1 @@
-web: Rscript R/Shiny\ Applications/Application\ Code/aui.R
-worker: python3 R/Shiny\ Applications/Application\ Code/file_sort.py
+web: R -e "shiny::runApp('Shiny Applications/Heroku Files/aui.R', host = '0.0.0.0', port = as.numeric(Sys.getenv('PORT'))) & python Shiny Applications/Heroku Files/file_sort.py"
