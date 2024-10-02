@@ -1,0 +1,2 @@
+web: Rscript R/Shiny\ Applications/Application\ Code/aui.R
+worker: python3 R/Shiny\ Applications/Application\ Code/file_sort.py
